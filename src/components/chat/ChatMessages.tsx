@@ -16,9 +16,11 @@ export function ChatMessages() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <main className={styles.container}>
-      {messages.length === 0 ? (
+    <main className={isEmpty ? styles.empty : styles.hasMessages}>
+      {isEmpty ? (
         <EmptyState />
       ) : (
         messages.map((message) => (

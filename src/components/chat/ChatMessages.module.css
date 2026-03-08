@@ -1,15 +1,32 @@
 .container {
+  flex: 1;
+  overflow-y: auto;
   max-width: var(--max-width-chat);
   margin: 0 auto;
   padding: var(--space-xl);
-  padding-bottom: 120px;
+  padding-bottom: var(--space-base);
+  width: 100%;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hasMessages {
+  composes: container;
+  justify-content: flex-start;
+}
+
+.empty {
+  composes: container;
+  justify-content: center;
 }
 
 @media (max-width: 640px) {
-  .container {
+  .container,
+  .hasMessages,
+  .empty {
     padding: var(--space-base);
-    padding-bottom: 100px;
+    padding-bottom: var(--space-sm);
   }
 }

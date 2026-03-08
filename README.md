@@ -5,15 +5,16 @@
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Mastra](https://img.shields.io/badge/Mastra-AI_Agents-purple)
 
 ## Overview
 
 EDU Capability Velocity is a production-ready AI learning platform that converts natural language into structured, interactive learning materials. Built with a **micro-experience architecture**, each capability (flashcards, quizzes, study plans, study packages) is a self-contained, reusable module with its own schema, UI component, and rendering pipeline.
 
-### Key Features
+### Features
 
 - **🔄 Content Converter Agent** — Generate flashcards, quizzes, and study plans from any topic
-- **📚 Study Package Agent** — Create structured study packages from files and notes
+- **📚 Study Package Agent** — Create structured study packages from notes
 - **🃏 Interactive Flashcards** — Flip cards, track progress, navigate decks
 - **📝 Quiz Runner** — Multiple-choice quizzes with scoring and explanations
 - **📋 Study Plans** — Day-by-day learning schedules with milestones
@@ -24,23 +25,25 @@ EDU Capability Velocity is a production-ready AI learning platform that converts
 | Layer | Technology |
 |-------|-----------|
 | Framework | Next.js 16 (App Router, Turbopack) |
-| AI | Mastra agents + OpenAI GPT-4o-mini |
+| Language | TypeScript 5 |
+| AI Agents | Mastra + OpenAI GPT-4o-mini |
 | Streaming | AI SDK v6 (UIMessageStream) |
 | Schemas | Zod (structured output validation) |
-| Styling | CSS Modules + Design Tokens |
+| Styling | CSS Modules + CSS Custom Properties |
+| Font | Inter (via next/font) |
 | Deployment | Vercel |
 
 ## Quick Start
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Set up environment variables
+# 2. Set up environment variables
 cp .env.local.example .env.local
 # Add your OPENAI_API_KEY to .env.local
 
-# Run development server
+# 3. Run development server
 npm run dev
 ```
 
@@ -50,34 +53,59 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENAI_API_KEY` | Yes | OpenAI API key for GPT-4o-mini |
+| `OPENAI_API_KEY` | ✅ | OpenAI API key for GPT-4o-mini |
 
 ## Architecture
 
 ```
 src/
-├── app/                     # Next.js App Router
-│   ├── layout.tsx           # Root layout (Inter font, SEO)
-│   ├── page.tsx             # Entry point (5 lines)
-│   ├── globals.css          # Global styles + animations
-│   └── api/chat/route.ts    # Chat API (Mastra → AI SDK bridge)
+├── app/                         # Next.js App Router
+│   ├── layout.tsx               # Root layout (Inter font, SEO metadata)
+│   ├── page.tsx                 # Entry point (5 lines)
+│   ├── globals.css              # Global styles + keyframe animations
+│   └── api/chat/route.ts        # Chat API (Mastra → AI SDK v6 bridge)
 ├── styles/
-│   └── design-tokens.css    # Design system (CSS custom properties)
+│   └── design-tokens.css        # Design system (100+ CSS custom properties)
 ├── config/
-│   └── agents.config.ts     # Agent definitions + suggestions
+│   └── agents.config.ts         # Agent definitions + suggestion prompts
 ├── context/
-│   └── ChatContext.tsx       # Shared state provider
+│   └── ChatContext.tsx           # Shared state provider (agent, chat, input)
 ├── components/
-│   ├── chat/                # Chat UI (8 components + CSS Modules)
-│   ├── micro/               # Micro-experience renderers
-│   │   ├── FlashcardDeck/
-│   │   ├── QuizRunner/
-│   │   ├── StudyPlanView/
-│   │   └── StudyPackageCard/
-│   └── StructuredRenderer.tsx  # JSON → UI dispatcher
-├── schemas/                 # Zod schemas for structured output
-└── mastra/                  # Mastra agent + tool definitions
+│   ├── chat/                    # Chat UI (8 components + CSS Modules)
+│   │   ├── ChatLayout.tsx       # Main shell (flex column layout)
+│   │   ├── ChatHeader.tsx       # Brand + agent selector tabs
+│   │   ├── ChatMessages.tsx     # Message list with auto-scroll
+│   │   ├── ChatBubble.tsx       # Message bubble (user vs assistant)
+│   │   ├── ChatInput.tsx        # Glass input bar + gradient send button
+│   │   ├── EmptyState.tsx       # Welcome screen with suggestion chips
+│   │   ├── SuggestionChip.tsx   # Clickable prompt pill
+│   │   └── LoadingIndicator.tsx # Pulsing "thinking" indicator
+│   ├── micro/                   # Micro-experience renderers
+│   │   ├── FlashcardDeck/       # Interactive flashcard UI
+│   │   ├── QuizRunner/          # Quiz with scoring + explanations
+│   │   ├── StudyPlanView/       # Day-by-day study schedule
+│   │   └── StudyPackageCard/    # Organized study materials
+│   └── StructuredRenderer.tsx   # JSON → UI dispatcher (type registry)
+├── schemas/                     # Zod schemas for structured AI output
+│   ├── flashcard.ts
+│   ├── quiz.ts
+│   ├── study-plan.ts
+│   └── study-package.ts
+└── mastra/                      # Mastra agent + tool definitions
+    ├── agents/
+    └── tools/
 ```
+
+## Design System
+
+The UI uses a **glassmorphism design system** with CSS Custom Properties:
+
+- Animated gradient background orbs
+- Glass blur (`backdrop-filter`) on all interactive surfaces
+- Gradient accent text and buttons
+- Slide-in message animations
+- Glow/shadow effects on focus and hover
+- Responsive breakpoints at 640px
 
 ## Deployment
 
@@ -86,15 +114,24 @@ src/
 1. Push to GitHub
 2. Import repository in [Vercel Dashboard](https://vercel.com/new)
 3. Add `OPENAI_API_KEY` to Environment Variables
-4. Deploy
+4. Deploy — production-ready with zero config
 
 ### Manual Build
 
 ```bash
-npm run build
-npm start
+npm run build   # Production build
+npm start       # Start production server
 ```
+
+## Security
+
+Production builds include the following security headers:
+
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 
 ## License
 
-Proprietary — All Rights Reserved. See [LICENSE](./LICENSE) for details.
+Proprietary — All Rights Reserved © 2026 MemorAIz. See [LICENSE](./LICENSE).
