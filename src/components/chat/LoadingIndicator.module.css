@@ -1,19 +1,23 @@
 .container {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   padding: var(--space-md) 0;
   align-items: center;
-  animation: fadeInUp var(--transition-slow);
+  animation: fadeIn 0.4s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .dot {
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
-  animation: pulse 1.2s infinite;
+  animation: pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor;
 }
 
 .text {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  font-style: italic;
 }

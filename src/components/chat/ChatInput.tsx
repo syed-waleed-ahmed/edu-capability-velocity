@@ -31,9 +31,6 @@ export function ChatInput() {
           type="submit"
           disabled={isLoading || !inputText.trim()}
           className={styles.sendButton}
-          style={{
-            background: `linear-gradient(135deg, ${selectedAgent.color}, ${selectedAgent.color}cc)`,
-          }}
         >
           Send ↑
         </button>

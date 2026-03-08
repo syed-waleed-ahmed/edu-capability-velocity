@@ -13,7 +13,7 @@ export const AGENTS: AgentConfig[] = [
     name: "Content Converter",
     icon: "🔄",
     description: "Text → Flashcards, Quizzes, Study Plans",
-    color: "#6366f1",
+    color: "#8b5cf6",
     suggestions: [
       "Generate flashcards about photosynthesis",
       "Create a quiz on World War II",

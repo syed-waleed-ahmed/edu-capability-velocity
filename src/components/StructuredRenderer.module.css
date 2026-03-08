@@ -1,22 +1,27 @@
 .fallback {
-  background: var(--color-bg-surface);
-  border-radius: var(--radius-base);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   padding: var(--space-base);
   font-family: var(--font-family);
   color: var(--color-text-secondary);
   font-size: var(--font-size-base);
   animation: fadeInUp var(--transition-slow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .fallbackTitle {
   margin: 0 0 var(--space-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .fallbackCode {
   margin: 0;
   white-space: pre-wrap;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   line-height: var(--line-height-normal);
+  color: var(--color-text-muted);
 }

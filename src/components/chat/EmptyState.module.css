@@ -1,39 +1,47 @@
 .container {
   text-align: center;
   padding: var(--space-5xl) var(--space-lg);
-  animation: fadeInUp var(--transition-slow);
+  animation: fadeIn 0.6s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .icon {
-  font-size: var(--font-size-4xl);
-  margin-bottom: var(--space-base);
+  font-size: 56px;
+  margin-bottom: var(--space-xl);
   line-height: 1;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 20px rgba(139, 92, 246, 0.3));
 }
 
 .title {
   font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-sm);
   color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .description {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-md);
   color: var(--color-text-muted);
-  max-width: 400px;
+  max-width: 420px;
   margin: 0 auto;
   line-height: var(--line-height-relaxed);
 }
 
 .suggestions {
-  margin-top: var(--space-xl);
+  margin-top: var(--space-2xl);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: 10px;
   justify-content: center;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .container {
     padding: var(--space-4xl) var(--space-base);
   }

@@ -1,6 +1,34 @@
 # EDU Capability Velocity
 
-> **Proving (and improving) our capability velocity for the EDU Suite** — how quickly we can take an external capability, wrap it into a Mastra building block, and ship it with a rendered UI.
+> AI-powered learning micro-experiences — transform text into interactive flashcards, quizzes, and study plans in seconds.
+
+![License](https://img.shields.io/badge/license-Proprietary-red)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+
+## Overview
+
+EDU Capability Velocity is a production-ready AI learning platform that converts natural language into structured, interactive learning materials. Built with a **micro-experience architecture**, each capability (flashcards, quizzes, study plans, study packages) is a self-contained, reusable module with its own schema, UI component, and rendering pipeline.
+
+### Key Features
+
+- **🔄 Content Converter Agent** — Generate flashcards, quizzes, and study plans from any topic
+- **📚 Study Package Agent** — Create structured study packages from files and notes
+- **🃏 Interactive Flashcards** — Flip cards, track progress, navigate decks
+- **📝 Quiz Runner** — Multiple-choice quizzes with scoring and explanations
+- **📋 Study Plans** — Day-by-day learning schedules with milestones
+- **📦 Study Packages** — Organized sections with key concepts and reading order
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| AI | Mastra agents + OpenAI GPT-4o-mini |
+| Streaming | AI SDK v6 (UIMessageStream) |
+| Schemas | Zod (structured output validation) |
+| Styling | CSS Modules + Design Tokens |
+| Deployment | Vercel |
 
 ## Quick Start
 
@@ -8,72 +36,65 @@
 # Install dependencies
 npm install
 
-# Set your API key
-export OPENAI_API_KEY=your-key-here
+# Set up environment variables
+cp .env.local.example .env.local
+# Add your OPENAI_API_KEY to .env.local
 
-# Run dev server
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Yes | OpenAI API key for GPT-4o-mini |
 
 ## Architecture
 
 ```
-User Input → Mastra Agent (+ tools) → Structured JSON (Zod) → UI Component (React)
+src/
+├── app/                     # Next.js App Router
+│   ├── layout.tsx           # Root layout (Inter font, SEO)
+│   ├── page.tsx             # Entry point (5 lines)
+│   ├── globals.css          # Global styles + animations
+│   └── api/chat/route.ts    # Chat API (Mastra → AI SDK bridge)
+├── styles/
+│   └── design-tokens.css    # Design system (CSS custom properties)
+├── config/
+│   └── agents.config.ts     # Agent definitions + suggestions
+├── context/
+│   └── ChatContext.tsx       # Shared state provider
+├── components/
+│   ├── chat/                # Chat UI (8 components + CSS Modules)
+│   ├── micro/               # Micro-experience renderers
+│   │   ├── FlashcardDeck/
+│   │   ├── QuizRunner/
+│   │   ├── StudyPlanView/
+│   │   └── StudyPackageCard/
+│   └── StructuredRenderer.tsx  # JSON → UI dispatcher
+├── schemas/                 # Zod schemas for structured output
+└── mastra/                  # Mastra agent + tool definitions
 ```
 
-Every feature follows this architecture, making each one a **reusable building block**.
+## Deployment
 
-## What's Inside
+### Vercel (Recommended)
 
-### Prototypes
+1. Push to GitHub
+2. Import repository in [Vercel Dashboard](https://vercel.com/new)
+3. Add `OPENAI_API_KEY` to Environment Variables
+4. Deploy
 
-| # | Agent | Category | What it does |
-|---|-------|----------|-------------|
-| 1 | **Study Package Agent** | Connection (MCP) | Reads files from filesystem → creates structured study packages |
-| 2 | **Content Converter Agent** | Conversion (Skill) | Takes text → generates flashcards, quizzes, and study plans |
+### Manual Build
 
-### Schemas (`src/schemas/`)
-- `study-package.ts` — Study package with key concepts, sections, reading order
-- `flashcard.ts` — Flashcard deck with front/back cards and difficulty levels
-- `quiz.ts` — Quiz with MCQ + open-ended questions, answers, explanations
-- `study-plan.ts` — Study plan with sessions, activities, milestones
-
-### UI Components (`src/components/`)
-- `StudyPackageCard` — Dark gradient card with expandable sections
-- `FlashcardDeck` — Interactive flip cards with progress tracking
-- `QuizRunner` — MCQ quiz with scoring and explanation reveal
-- `StudyPlanView` — Timeline view with sessions and milestones
-- `StructuredRenderer` — Generic JSON → UI dispatcher
-
-### Tracking (`tracking/`)
-- `use_case_table.md` — 15 EDU use cases with personas, triggers, success criteria
-- `capability_registry.md` — 22 capabilities (12 skills + 10 MCP servers) scored and ranked
-- `sources.md` — Reference links to guides and catalogs
-
-## Project Structure
-
-```
-edu-capability-velocity/
-├── src/
-│   ├── mastra/
-│   │   ├── agents/           # Mastra agents (2 prototypes)
-│   │   ├── tools/            # Mastra tools (filesystem reader)
-│   │   └── index.ts          # Mastra instance config
-│   ├── schemas/              # Zod output schemas (4 types)
-│   ├── components/           # React UI micro-experiences (5 components)
-│   └── app/
-│       ├── api/chat/route.ts # Vercel AI SDK chat endpoint
-│       └── page.tsx          # Chat UI with agent selector
-├── tracking/                 # Research & evaluation documents
-└── package.json
+```bash
+npm run build
+npm start
 ```
 
-## Tech Stack
+## License
 
-- **Framework**: Next.js 16 + TypeScript
-- **Agents**: Mastra (`@mastra/core`)
-- **Schemas**: Zod
-- **Chat**: Vercel AI SDK v6 (`ai` + `@ai-sdk/react`)
-- **LLM**: OpenAI GPT-4o-mini (configurable)
+Proprietary — All Rights Reserved. See [LICENSE](./LICENSE) for details.
