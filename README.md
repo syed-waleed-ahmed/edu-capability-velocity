@@ -59,6 +59,12 @@ Open [http://localhost:3000](http://localhost:3000).
 |----------|----------|-------------|
 | `OPENAI_API_KEY` | ✅ | OpenAI API key for GPT-4o-mini |
 | `GOOGLE_DRIVE_ACCESS_TOKEN` | Optional | OAuth access token for Drive connector tools |
+| `COMMERCIAL_API_KEY` | Recommended (Prod) | Protects `/api/chat` (send via `x-api-key` or `Authorization: Bearer`) |
+| `API_RATE_LIMIT_MAX_REQUESTS` | Optional | Max chat requests allowed per rate-limit window (default `30`) |
+| `API_RATE_LIMIT_WINDOW_MS` | Optional | Rate-limit window duration in milliseconds (default `60000`) |
+| `API_MAX_MESSAGES_PER_REQUEST` | Optional | Maximum message count accepted by `/api/chat` (default `40`) |
+| `API_MAX_TEXT_CHARS_PER_REQUEST` | Optional | Maximum cumulative text characters per chat request (default `40000`) |
+| `API_MAX_TEXT_CHARS_PER_MESSAGE` | Optional | Maximum text characters for a single message in chat history (default `8000`) |
 | `CAPABILITY_TELEMETRY_FILE` | Optional | Custom output path for telemetry NDJSON (defaults to `artifacts/telemetry/capability-events.ndjson`) |
 
 ## Architecture
@@ -137,6 +143,15 @@ Operational planning and execution artifacts are stored under `docs/capability-v
 - `top10-starter-shortlist.md`: scored shortlist baseline.
 - `evidence/`: hello-world prototype evidence files.
 - `reports/weekly-kpi-report.md`: weekly KPI report artifact.
+- `commercial-readiness.md`: commercialization gate checklist.
+
+## Commercial Deployment Essentials
+
+- Enable `COMMERCIAL_API_KEY` in production.
+- Set rate-limit and payload controls (`API_RATE_LIMIT_*`, `API_MAX_*`).
+- Expose legal pages to end users: `/legal/terms` and `/legal/privacy`.
+- Monitor health endpoint: `/api/health`.
+- Keep CI gates (`lint`, `typecheck`, `test`, `build`) mandatory before release.
 
 ## Telemetry Output
 
@@ -180,6 +195,12 @@ Production builds include the following security headers:
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+`/api/chat` also includes:
+
+- Optional API key authentication (`COMMERCIAL_API_KEY`)
+- IP-based rate limiting
+- Payload shape and size validation
 
 ## License
 

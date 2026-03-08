@@ -64,6 +64,24 @@
   gap: var(--space-sm);
 }
 
+.legalLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.legalLink {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--font-size-xs);
+  transition: color var(--transition-fast);
+}
+
+.legalLink:hover {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
 .agentTab {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -145,6 +163,10 @@
     width: 100%;
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .legalLinks {
+    justify-content: center;
   }
 
   .agentTabs {

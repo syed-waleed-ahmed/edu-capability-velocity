@@ -16,6 +16,7 @@ This folder turns the strategy into an executable workflow for the EDU Suite.
 - `rapid-test-template.md`: Template to log test inputs/outputs, latency, and blockers.
 - `top10-starter-shortlist.md`: Initial candidate pool and suggested mandatory prototypes.
 - `global-readiness-checklist.md`: Requirements to scale safely across regions and tenants.
+- `commercial-readiness.md`: Launch checklist for auth, abuse controls, legal, and monitoring.
 - `raw-capability-pool.csv`: 30+ initial capabilities for Phase 1 scanning baseline.
 - `evidence/`: Hello-world test evidence and sample outputs for mandatory prototypes.
 - `reports/weekly-kpi-report.md`: Auto-generated weekly KPI artifact from telemetry events.

@@ -2,6 +2,7 @@
 
 import { useChatContext } from "@/context/ChatContext";
 import { AGENTS } from "@/config/agents.config";
+import Link from "next/link";
 import styles from "./ChatHeader.module.css";
 
 export function ChatHeader() {
@@ -50,6 +51,15 @@ export function ChatHeader() {
         >
           New chat
         </button>
+
+        <div className={styles.legalLinks}>
+          <Link className={styles.legalLink} href="/legal/terms">
+            Terms
+          </Link>
+          <Link className={styles.legalLink} href="/legal/privacy">
+            Privacy
+          </Link>
+        </div>
       </div>
     </header>
   );
