@@ -13,7 +13,8 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
   const [completed, setCompleted] = useState<Set<number>>(new Set());
 
   const card = data.cards[currentIndex];
-  const progress = ((completed.size / data.totalCards) * 100).toFixed(0);
+  const totalCards = data.totalCards || data.cards.length;
+  const progress = ((completed.size / totalCards) * 100).toFixed(0);
 
   const diffColors = {
     easy: { bg: "#065f46", border: "#10b981" },
@@ -80,7 +81,7 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
             {progress}%
           </div>
           <div style={{ fontSize: "11px", opacity: 0.5 }}>
-            {completed.size}/{data.totalCards} cards
+            {completed.size}/{totalCards} cards
           </div>
         </div>
       </div>
