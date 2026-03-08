@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EDU Capability Velocity
 
-## Getting Started
+> **Proving (and improving) our capability velocity for the EDU Suite** — how quickly we can take an external capability, wrap it into a Mastra building block, and ship it with a rendered UI.
 
-First, run the development server:
+## Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Set your API key
+export OPENAI_API_KEY=your-key-here
+
+# Run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+User Input → Mastra Agent (+ tools) → Structured JSON (Zod) → UI Component (React)
+```
 
-## Learn More
+Every feature follows this architecture, making each one a **reusable building block**.
 
-To learn more about Next.js, take a look at the following resources:
+## What's Inside
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prototypes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| # | Agent | Category | What it does |
+|---|-------|----------|-------------|
+| 1 | **Study Package Agent** | Connection (MCP) | Reads files from filesystem → creates structured study packages |
+| 2 | **Content Converter Agent** | Conversion (Skill) | Takes text → generates flashcards, quizzes, and study plans |
 
-## Deploy on Vercel
+### Schemas (`src/schemas/`)
+- `study-package.ts` — Study package with key concepts, sections, reading order
+- `flashcard.ts` — Flashcard deck with front/back cards and difficulty levels
+- `quiz.ts` — Quiz with MCQ + open-ended questions, answers, explanations
+- `study-plan.ts` — Study plan with sessions, activities, milestones
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### UI Components (`src/components/`)
+- `StudyPackageCard` — Dark gradient card with expandable sections
+- `FlashcardDeck` — Interactive flip cards with progress tracking
+- `QuizRunner` — MCQ quiz with scoring and explanation reveal
+- `StudyPlanView` — Timeline view with sessions and milestones
+- `StructuredRenderer` — Generic JSON → UI dispatcher
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Tracking (`tracking/`)
+- `use_case_table.md` — 15 EDU use cases with personas, triggers, success criteria
+- `capability_registry.md` — 22 capabilities (12 skills + 10 MCP servers) scored and ranked
+- `sources.md` — Reference links to guides and catalogs
+
+## Project Structure
+
+```
+edu-capability-velocity/
+├── src/
+│   ├── mastra/
+│   │   ├── agents/           # Mastra agents (2 prototypes)
+│   │   ├── tools/            # Mastra tools (filesystem reader)
+│   │   └── index.ts          # Mastra instance config
+│   ├── schemas/              # Zod output schemas (4 types)
+│   ├── components/           # React UI micro-experiences (5 components)
+│   └── app/
+│       ├── api/chat/route.ts # Vercel AI SDK chat endpoint
+│       └── page.tsx          # Chat UI with agent selector
+├── tracking/                 # Research & evaluation documents
+└── package.json
+```
+
+## Tech Stack
+
+- **Framework**: Next.js 16 + TypeScript
+- **Agents**: Mastra (`@mastra/core`)
+- **Schemas**: Zod
+- **Chat**: Vercel AI SDK v6 (`ai` + `@ai-sdk/react`)
+- **LLM**: OpenAI GPT-4o-mini (configurable)
