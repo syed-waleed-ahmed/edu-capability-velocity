@@ -5,10 +5,12 @@ import { StudyPackageCard } from "./micro/StudyPackageCard";
 import { FlashcardDeckComponent } from "./micro/FlashcardDeck";
 import { QuizRunner } from "./micro/QuizRunner";
 import { StudyPlanView } from "./micro/StudyPlanView";
+import { DriveStudyPackageCard } from "./micro/DriveStudyPackageCard";
+import type { StructuredOutput } from "@/schemas/structured-output";
 import styles from "./StructuredRenderer.module.css";
 
 interface StructuredRendererProps {
-  data: Record<string, unknown>;
+  data: StructuredOutput;
 }
 
 /**
@@ -21,17 +23,19 @@ interface StructuredRendererProps {
  * automatic UI rendering by adding a case here.
  */
 export function StructuredRenderer({ data }: StructuredRendererProps) {
-  const type = data?.type as string;
+  const type = data.type;
 
   switch (type) {
+    case "drive-study-package":
+      return <DriveStudyPackageCard data={data} />;
     case "study-package":
-      return <StudyPackageCard data={data as any} />;
+      return <StudyPackageCard data={data} />;
     case "flashcards":
-      return <FlashcardDeckComponent data={data as any} />;
+      return <FlashcardDeckComponent data={data} />;
     case "quiz":
-      return <QuizRunner data={data as any} />;
+      return <QuizRunner data={data} />;
     case "study-plan":
-      return <StudyPlanView data={data as any} />;
+      return <StudyPlanView data={data} />;
     default:
       return (
         <div className={styles.fallback}>

@@ -1,13 +1,12 @@
 "use client";
 
-import { FormEvent, useRef } from "react";
+import { FormEvent, KeyboardEvent } from "react";
 import { useChatContext } from "@/context/ChatContext";
 import styles from "./ChatInput.module.css";
 
 export function ChatInput() {
   const { selectedAgent, inputText, setInputText, sendMessage, isLoading } =
     useChatContext();
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e?: FormEvent) => {
     e?.preventDefault();
@@ -17,15 +16,24 @@ export function ChatInput() {
     await sendMessage({ text });
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void handleSubmit();
+    }
+  };
+
   return (
     <div className={styles.container}>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <input
-          ref={inputRef}
+        <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={`Ask ${selectedAgent.name} to generate learning materials...`}
           className={styles.input}
+          rows={1}
+          aria-label="Message input"
         />
         <button
           type="submit"
@@ -35,6 +43,7 @@ export function ChatInput() {
           Send ↑
         </button>
       </form>
+      <p className={styles.hint}>Enter to send, Shift+Enter for a new line</p>
     </div>
   );
 }

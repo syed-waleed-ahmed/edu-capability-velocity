@@ -9,7 +9,7 @@ interface SuggestionChipProps {
 
 export function SuggestionChip({ text, onClick }: SuggestionChipProps) {
   return (
-    <button className={styles.chip} onClick={() => onClick(text)}>
+    <button type="button" className={styles.chip} onClick={() => onClick(text)}>
       {text}
     </button>
   );

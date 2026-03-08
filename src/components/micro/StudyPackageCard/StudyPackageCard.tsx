@@ -42,15 +42,26 @@ export function StudyPackageCard({ data }: StudyPackageCardProps) {
         <div className={styles.sections}>
           {data.sections.map((section, i) => (
             <div key={i} className={styles.section}>
-              <div className={styles.sectionHeader} onClick={() => toggle(i)}>
+              <button
+                type="button"
+                className={styles.sectionHeader}
+                onClick={() => toggle(i)}
+                aria-expanded={expandedSection === i}
+                aria-controls={`study-package-section-${i}`}
+              >
                 <span>{section.title}</span>
                 <span className={styles.sectionToggle}>
                   {section.readingTimeMinutes}min{" "}
                   {expandedSection === i ? "▲" : "▼"}
                 </span>
-              </div>
+              </button>
               {expandedSection === i && (
-                <div className={styles.sectionBody}>{section.summary}</div>
+                <div
+                  id={`study-package-section-${i}`}
+                  className={styles.sectionBody}
+                >
+                  {section.summary}
+                </div>
               )}
             </div>
           ))}

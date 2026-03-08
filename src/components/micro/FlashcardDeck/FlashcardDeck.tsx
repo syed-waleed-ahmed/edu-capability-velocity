@@ -58,9 +58,11 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
       </div>
 
       {/* Card */}
-      <div
+      <button
+        type="button"
         className={isFlipped ? styles.cardBack : styles.cardFront}
         onClick={() => setIsFlipped(!isFlipped)}
+        aria-label={isFlipped ? "Show question" : "Show answer"}
       >
         <div
           className={styles.diffBadge}
@@ -80,7 +82,7 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
         <div className={styles.flipHint}>
           {isFlipped ? "Click to see question" : "Click to flip"}
         </div>
-      </div>
+      </button>
 
       {/* Navigation */}
       <div className={styles.nav}>

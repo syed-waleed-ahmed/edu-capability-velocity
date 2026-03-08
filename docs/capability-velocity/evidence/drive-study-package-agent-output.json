@@ -1,0 +1,75 @@
+{
+  "type": "drive-study-package",
+  "title": "Algebra Revision Pack",
+  "subject": "Mathematics",
+  "difficulty": "intermediate",
+  "keyConcepts": [
+    {
+      "term": "Linear Equation",
+      "definition": "An equation where variables have power one and form a straight line relationship."
+    },
+    {
+      "term": "Slope",
+      "definition": "The rate of change of y with respect to x in a linear function."
+    },
+    {
+      "term": "Intercept",
+      "definition": "The value where a line crosses an axis."
+    },
+    {
+      "term": "Factorization",
+      "definition": "Writing an expression as a product of simpler expressions."
+    },
+    {
+      "term": "Simultaneous Equations",
+      "definition": "A set of equations solved together to find shared variable values."
+    }
+  ],
+  "sections": [
+    {
+      "title": "Core Linear Concepts",
+      "summary": "Covers slope, intercept form, and graph interpretation with short practice checks.",
+      "readingTimeMinutes": 25
+    },
+    {
+      "title": "Equation Solving Practice",
+      "summary": "Builds fluency in one-step and multi-step transformations and validates with substitution.",
+      "readingTimeMinutes": 30
+    },
+    {
+      "title": "Applications",
+      "summary": "Uses word problems to map real scenarios into equations and verify solutions.",
+      "readingTimeMinutes": 20
+    }
+  ],
+  "suggestedReadingOrder": [
+    "Core Linear Concepts",
+    "Equation Solving Practice",
+    "Applications"
+  ],
+  "totalReadingTimeMinutes": 75,
+  "source": {
+    "provider": "google-drive",
+    "folderId": "1A2B3C",
+    "fileCount": 2,
+    "files": [
+      {
+        "id": "file-001",
+        "name": "algebra-week1",
+        "mimeType": "application/vnd.google-apps.document",
+        "sizeBytes": 0,
+        "modifiedTime": "2026-03-07T09:10:00Z"
+      },
+      {
+        "id": "file-002",
+        "name": "equations-practice.csv",
+        "mimeType": "text/csv",
+        "sizeBytes": 18432,
+        "modifiedTime": "2026-03-07T09:13:00Z"
+      }
+    ]
+  },
+  "notes": [
+    "One source file was truncated during import to fit character budget."
+  ]
+}

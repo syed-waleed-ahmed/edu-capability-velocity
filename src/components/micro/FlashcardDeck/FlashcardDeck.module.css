@@ -9,7 +9,8 @@
   padding: var(--space-2xl);
   color: #fff;
   font-family: var(--font-family);
-  max-width: 540px;
+  width: 100%;
+  max-width: 680px;
   box-shadow: var(--shadow-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -91,6 +92,8 @@
 
 /* Card */
 .card {
+  border: none;
+  width: 100%;
   border-radius: var(--radius-xl);
   padding: var(--space-3xl) var(--space-xl);
   min-height: 180px;
@@ -103,6 +106,8 @@
   position: relative;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  text-align: center;
+  color: var(--color-text-primary);
 }
 
 .cardFront {

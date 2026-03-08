@@ -31,6 +31,17 @@ export const AGENTS: AgentConfig[] = [
       "Summarize and organize study material",
     ],
   },
+  {
+    id: "drive-study-package-agent",
+    name: "Drive Import",
+    icon: "📂",
+    description: "Google Drive → Structured Study Package",
+    color: "#3b82f6",
+    suggestions: [
+      "Import files from Drive folder 1A2B3C and create a study package",
+      "List files in my Drive folder and build a revision package",
+    ],
+  },
 ];
 
 export function getAgentById(id: string): AgentConfig {

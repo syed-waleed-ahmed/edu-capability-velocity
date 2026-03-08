@@ -7,7 +7,7 @@ export function LoadingIndicator() {
   const { selectedAgent } = useChatContext();
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} role="status" aria-live="polite">
       <div
         className={styles.dot}
         style={{ background: selectedAgent.color }}

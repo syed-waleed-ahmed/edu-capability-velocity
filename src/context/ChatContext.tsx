@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useRef } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { useChat, Chat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { AGENTS, getAgentById, type AgentConfig } from "@/config/agents.config";
@@ -14,6 +20,7 @@ interface ChatContextValue {
   /* Chat */
   messages: UIMessage[];
   sendMessage: (opts: { text: string }) => Promise<void>;
+  clearMessages: () => void;
   status: string;
   isLoading: boolean;
 
@@ -29,18 +36,37 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [inputText, setInputText] = useState("");
   const selectedAgent = getAgentById(agentId);
 
-  const chat = useRef(
-    new Chat({
-      transport: new DefaultChatTransport({
-        api: "/api/chat",
-        body: { agent: agentId },
+  const chat = useMemo(
+    () =>
+      new Chat({
+        transport: new DefaultChatTransport({
+          api: "/api/chat",
+        }),
       }),
-    })
-  ).current;
+    []
+  );
 
-  const { messages, sendMessage, status } = useChat({ chat });
+  const {
+    messages,
+    sendMessage: rawSendMessage,
+    setMessages,
+    status,
+  } = useChat({ chat });
+
+  const sendMessage = useCallback(
+    async (opts: { text: string }) => {
+      await rawSendMessage(opts, {
+        body: { agent: agentId },
+      });
+    },
+    [rawSendMessage, agentId]
+  );
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, [setMessages]);
 
   return (
     <ChatContext.Provider
@@ -49,6 +75,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setSelectedAgentId: setAgentId,
         messages,
         sendMessage,
+        clearMessages,
         status,
         isLoading,
         inputText,

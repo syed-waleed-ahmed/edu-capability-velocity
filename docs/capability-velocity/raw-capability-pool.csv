@@ -1,0 +1,37 @@
+capability_id,capability_name,type,persona,six_c_category,source,notes
+RAW-001,Lesson text to flashcards,Skill/Playbook,student,Conversion,Prompt playbook,High frequency student use
+RAW-002,Lesson text to quiz,Skill/Playbook,teacher,Creation,Prompt playbook,Formative assessment support
+RAW-003,Lesson text to study plan,Skill/Playbook,student,Knowledge,Prompt playbook,Weekly revision planning
+RAW-004,Syllabus to milestone tracker,Skill/Playbook,student,Control,Prompt playbook,Useful for semester structure
+RAW-005,Rubric to revision checklist,Skill/Playbook,student,Conversion,Prompt playbook,Reduces ambiguity in grading goals
+RAW-006,Error log to remediation plan,Skill/Playbook,student,Knowledge,Prompt playbook,Targets weak concepts quickly
+RAW-007,Reading passage to comprehension quiz,Skill/Playbook,teacher,Creation,Prompt playbook,Reusable in class prep
+RAW-008,Topic to exam-style practice set,Skill/Playbook,student,Creation,Prompt playbook,Supports exam prep
+RAW-009,Notes to key concept glossary,Skill/Playbook,student,Knowledge,Prompt playbook,Good for memory retention
+RAW-010,Objectives to differentiated tasks,Skill/Playbook,teacher,Engagement,Prompt playbook,Supports mixed-ability classes
+RAW-011,Google Drive import to study package,MCP,teacher,Connection,Google Drive API,Implemented baseline
+RAW-012,Google Docs content fetch,MCP,teacher,Connection,Google Docs API,Needs auth and parsing
+RAW-013,Google Classroom coursework import,MCP,teacher,Connection,Google Classroom API,Requires educator auth scopes
+RAW-014,Canvas module import,MCP,teacher,Connection,Canvas LMS API,High impact for schools
+RAW-015,Moodle course resource import,MCP,teacher,Connection,Moodle API,Host-specific setup
+RAW-016,OneDrive file import,MCP,teacher,Connection,Microsoft Graph API,Enterprise integration
+RAW-017,SharePoint lesson repository fetch,MCP,admin,Connection,Microsoft Graph API,Useful for district deployments
+RAW-018,Outlook calendar sync for study plan,MCP,student,Control,Microsoft Graph API,Good planning workflow
+RAW-019,Google Calendar scheduling,MCP,student,Control,Google Calendar API,Useful for reminders
+RAW-020,Web trusted source fetch,MCP,teacher,Knowledge,Web fetch service,Needs content safety controls
+RAW-021,PDF extraction to study package,MCP,teacher,Conversion,PDF parsing service,Supports legacy material
+RAW-022,DOCX extraction to quiz pipeline,MCP,teacher,Conversion,Document parsing service,Common teacher format
+RAW-023,YouTube transcript import,Hybrid,student,Knowledge,YouTube + playbook,Useful for flipped classrooms
+RAW-024,Drive import plus converter,Hybrid,teacher,Connection,Drive API + playbook,High strategic fit
+RAW-025,LMS import plus quiz generator,Hybrid,teacher,Creation,LMS API + playbook,Strong classroom workflow
+RAW-026,Assignment deadline sync plus planner,Hybrid,student,Control,Calendar API + playbook,Reduces missed deadlines
+RAW-027,Parent summary report generator,Skill/Playbook,teacher,Connection,Prompt playbook,Communication use case
+RAW-028,Class activity suggestion engine,Skill/Playbook,teacher,Engagement,Prompt playbook,Daily lesson support
+RAW-029,Student reflection prompt pack,Skill/Playbook,student,Engagement,Prompt playbook,Supports metacognition
+RAW-030,Admin policy to rollout checklist,Skill/Playbook,admin,Control,Prompt playbook,Operational enablement
+RAW-031,Attendance pattern insights,Hybrid,admin,Knowledge,SIS API + playbook,Data governance needed
+RAW-032,Assessment item bank tagging,MCP,teacher,Knowledge,Item bank API,Requires taxonomy mapping
+RAW-033,Reference citation helper,Skill/Playbook,student,Knowledge,Prompt playbook,Academic integrity support
+RAW-034,Language adaptation for materials,Skill/Playbook,teacher,Engagement,Prompt playbook,Localization support
+RAW-035,Accessibility rewrite assistant,Skill/Playbook,teacher,Connection,Prompt playbook,Supports inclusion
+RAW-036,Study group session scheduler,Hybrid,student,Connection,Calendar + messaging API,Cross-user flow

@@ -34,9 +34,12 @@ export function StudyPlanView({ data }: StudyPlanViewProps) {
 
           return (
             <div key={i} className={styles.session}>
-              <div
+              <button
+                type="button"
                 className={styles.sessionHeader}
                 onClick={() => toggle(i)}
+                aria-expanded={isExpanded}
+                aria-controls={`study-plan-session-${i}`}
               >
                 <span className={styles.sessionTitle}>
                   Day {session.day}: {session.topic}
@@ -44,10 +47,10 @@ export function StudyPlanView({ data }: StudyPlanViewProps) {
                 <span className={styles.sessionDuration}>
                   {session.durationMinutes}min {isExpanded ? "▲" : "▼"}
                 </span>
-              </div>
+              </button>
 
               {isExpanded && (
-                <div className={styles.sessionBody}>
+                <div id={`study-plan-session-${i}`} className={styles.sessionBody}>
                   {/* Activities */}
                   {session.activities && session.activities.length > 0 && (
                     <div className={styles.activities}>

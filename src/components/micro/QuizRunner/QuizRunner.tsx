@@ -8,15 +8,28 @@ interface QuizRunnerProps {
   data: Quiz;
 }
 
+function normalizeAnswer(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function QuizRunner({ data }: QuizRunnerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
   const [showExplanation, setShowExplanation] = useState(false);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
   const question = data.questions[currentIndex];
   const progress = (((currentIndex + 1) / data.questions.length) * 100).toFixed(0);
+  const isOpenEnded = question.type === "open_ended";
+  const currentAnswer = isOpenEnded ? typedAnswer : selectedAnswer ?? "";
+  const canCheckAnswer = currentAnswer.trim().length > 0;
 
   const handleSelect = (option: string) => {
     if (showExplanation) return;
@@ -24,9 +37,14 @@ export function QuizRunner({ data }: QuizRunnerProps) {
   };
 
   const handleCheck = () => {
-    if (!selectedAnswer) return;
+    if (!canCheckAnswer) return;
+
     setShowExplanation(true);
-    if (selectedAnswer === question.correctAnswer) {
+    const correct =
+      normalizeAnswer(currentAnswer) === normalizeAnswer(question.correctAnswer);
+    setIsAnswerCorrect(correct);
+
+    if (correct) {
       setScore((s) => s + 1);
     }
   };
@@ -35,7 +53,9 @@ export function QuizRunner({ data }: QuizRunnerProps) {
     if (currentIndex < data.questions.length - 1) {
       setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);
+      setTypedAnswer("");
       setShowExplanation(false);
+      setIsAnswerCorrect(null);
     } else {
       setFinished(true);
     }
@@ -91,7 +111,7 @@ export function QuizRunner({ data }: QuizRunnerProps) {
       </div>
 
       {/* Options */}
-      {"options" in question && question.options && (
+      {question.type === "multiple_choice" && question.options && (
         <div className={styles.options}>
           {question.options.map((option: string, i: number) => {
             let className = styles.option;
@@ -122,6 +142,44 @@ export function QuizRunner({ data }: QuizRunnerProps) {
         </div>
       )}
 
+      {isOpenEnded && (
+        <div className={styles.openEnded}>
+          <label className={styles.openEndedLabel} htmlFor={`open-ended-${question.id}`}>
+            Your answer
+          </label>
+          <textarea
+            id={`open-ended-${question.id}`}
+            className={styles.openEndedInput}
+            value={typedAnswer}
+            onChange={(event) => setTypedAnswer(event.target.value)}
+            placeholder="Write your answer here"
+            disabled={showExplanation}
+          />
+        </div>
+      )}
+
+      {showExplanation && isOpenEnded && (
+        <div className={styles.answerReview}>
+          <div className={styles.answerRow}>
+            <span className={styles.answerKey}>Your answer:</span>
+            <span>{typedAnswer}</span>
+          </div>
+          <div className={styles.answerRow}>
+            <span className={styles.answerKey}>Expected answer:</span>
+            <span>{question.correctAnswer}</span>
+          </div>
+          <div
+            className={
+              isAnswerCorrect ? styles.answerCorrectText : styles.answerIncorrectText
+            }
+          >
+            {isAnswerCorrect
+              ? "Marked correct based on normalized text match."
+              : "Marked incorrect because the answer does not match closely enough."}
+          </div>
+        </div>
+      )}
+
       {/* Explanation */}
       {showExplanation && question.explanation && (
         <div className={styles.explanation}>
@@ -135,7 +193,7 @@ export function QuizRunner({ data }: QuizRunnerProps) {
         <button
           className={styles.nextButton}
           onClick={handleCheck}
-          disabled={!selectedAnswer}
+          disabled={!canCheckAnswer}
         >
           Check Answer
         </button>

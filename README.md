@@ -15,10 +15,12 @@ EDU Capability Velocity is a production-ready AI learning platform that converts
 
 - **🔄 Content Converter Agent** — Generate flashcards, quizzes, and study plans from any topic
 - **📚 Study Package Agent** — Create structured study packages from notes
+- **📂 Drive Import Agent** — Import Google Drive files into structured study packages
 - **🃏 Interactive Flashcards** — Flip cards, track progress, navigate decks
 - **📝 Quiz Runner** — Multiple-choice quizzes with scoring and explanations
 - **📋 Study Plans** — Day-by-day learning schedules with milestones
 - **📦 Study Packages** — Organized sections with key concepts and reading order
+- **📈 Capability Telemetry + KPI Report** — Capture runtime metrics and generate weekly capability reports
 
 ## Tech Stack
 
@@ -41,6 +43,8 @@ npm install
 
 # 2. Set up environment variables
 cp .env.local.example .env.local
+# PowerShell alternative:
+# Copy-Item .env.local.example .env.local
 # Add your OPENAI_API_KEY to .env.local
 
 # 3. Run development server
@@ -54,6 +58,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `OPENAI_API_KEY` | ✅ | OpenAI API key for GPT-4o-mini |
+| `GOOGLE_DRIVE_ACCESS_TOKEN` | Optional | OAuth access token for Drive connector tools |
+| `CAPABILITY_TELEMETRY_FILE` | Optional | Custom output path for telemetry NDJSON (defaults to `artifacts/telemetry/capability-events.ndjson`) |
 
 ## Architecture
 
@@ -84,17 +90,60 @@ src/
 │   │   ├── FlashcardDeck/       # Interactive flashcard UI
 │   │   ├── QuizRunner/          # Quiz with scoring + explanations
 │   │   ├── StudyPlanView/       # Day-by-day study schedule
-│   │   └── StudyPackageCard/    # Organized study materials
+│   │   ├── StudyPackageCard/    # Organized study materials
+│   │   └── DriveStudyPackageCard/ # Drive import source + study package view
 │   └── StructuredRenderer.tsx   # JSON → UI dispatcher (type registry)
+├── lib/
+│   ├── structured-output-parser.ts
+│   └── telemetry/
+│       └── capability-telemetry.ts # Runtime capability telemetry hooks
 ├── schemas/                     # Zod schemas for structured AI output
+│   ├── drive-study-package.ts
 │   ├── flashcard.ts
 │   ├── quiz.ts
 │   ├── study-plan.ts
-│   └── study-package.ts
+│   ├── study-package.ts
+│   └── structured-output.ts
 └── mastra/                      # Mastra agent + tool definitions
     ├── agents/
     └── tools/
 ```
+
+## Quality Gates
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+```
+
+CI runs these checks on push and pull requests via `.github/workflows/ci.yml`.
+
+## Capability KPI Reporting
+
+```bash
+npm run kpi:report
+```
+
+This generates `docs/capability-velocity/reports/weekly-kpi-report.md` from telemetry events.
+
+## Capability Velocity Docs
+
+Operational planning and execution artifacts are stored under `docs/capability-velocity/`:
+
+- `execution-status.md`: current phase completion status.
+- `raw-capability-pool.csv`: Phase 1 candidate pool.
+- `top10-starter-shortlist.md`: scored shortlist baseline.
+- `evidence/`: hello-world prototype evidence files.
+- `reports/weekly-kpi-report.md`: weekly KPI report artifact.
+
+## Telemetry Output
+
+Capability run telemetry is persisted to NDJSON at:
+
+- default: `artifacts/telemetry/capability-events.ndjson`
+- override with: `CAPABILITY_TELEMETRY_FILE`
 
 ## Design System
 

@@ -9,7 +9,8 @@
   padding: var(--space-2xl);
   color: #fff;
   font-family: var(--font-family);
-  max-width: 540px;
+  width: 100%;
+  max-width: 680px;
   box-shadow: var(--shadow-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -99,6 +100,9 @@
 }
 
 .sectionHeader {
+  width: 100%;
+  border: none;
+  background: transparent;
   padding: var(--space-md) var(--space-base);
   display: flex;
   justify-content: space-between;
@@ -108,6 +112,9 @@
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   transition: background var(--transition-normal);
+  color: var(--color-text-primary);
+  text-align: left;
+  font-family: var(--font-family);
 }
 
 .sectionHeader:hover {

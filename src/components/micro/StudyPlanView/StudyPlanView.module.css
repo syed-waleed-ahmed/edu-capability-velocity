@@ -9,7 +9,8 @@
   padding: var(--space-2xl);
   color: #fff;
   font-family: var(--font-family);
-  max-width: 540px;
+  width: 100%;
+  max-width: 680px;
   box-shadow: var(--shadow-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -75,6 +76,9 @@
 }
 
 .sessionHeader {
+  width: 100%;
+  border: none;
+  background: transparent;
   padding: var(--space-md) var(--space-base);
   display: flex;
   justify-content: space-between;
@@ -82,6 +86,9 @@
   cursor: pointer;
   user-select: none;
   transition: background var(--transition-normal);
+  text-align: left;
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
 }
 
 .sessionHeader:hover {

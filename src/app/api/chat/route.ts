@@ -1,4 +1,6 @@
 import { mastra } from "@/mastra";
+import { parseStructuredOutputFromText } from "@/lib/structured-output-parser";
+import { recordCapabilityRun } from "@/lib/telemetry/capability-telemetry";
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -6,6 +8,9 @@ import {
 } from "ai";
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
+
   try {
     const body = await req.json();
     const { messages, agent: agentId } = body;
@@ -14,6 +19,17 @@ export async function POST(req: Request) {
     const agent = mastra.getAgent(selectedAgentId);
 
     if (!agent) {
+      await recordCapabilityRun({
+        timestamp: new Date().toISOString(),
+        requestId,
+        agentId: selectedAgentId,
+        outcome: "failure",
+        durationMs: Date.now() - startedAt,
+        structuredType: null,
+        schemaValid: false,
+        errorMessage: `Agent "${selectedAgentId}" not found`,
+      });
+
       return new Response(
         JSON.stringify({ error: `Agent "${selectedAgentId}" not found` }),
         { status: 404, headers: { "Content-Type": "application/json" } }
@@ -28,18 +44,51 @@ export async function POST(req: Request) {
 
     const stream = createUIMessageStream({
       execute: async ({ writer }) => {
-        const mastraResult = await agent.stream(modelMessages);
+        let accumulatedText = "";
 
-        // Send text-start event
-        writer.write({ type: "text-start", id: textPartId });
+        try {
+          const mastraResult = await agent.stream(modelMessages);
 
-        // Stream text deltas
-        for await (const delta of mastraResult.textStream) {
-          writer.write({ type: "text-delta", id: textPartId, delta });
+          // Send text-start event
+          writer.write({ type: "text-start", id: textPartId });
+
+          // Stream text deltas
+          for await (const delta of mastraResult.textStream) {
+            accumulatedText += delta;
+            writer.write({ type: "text-delta", id: textPartId, delta });
+          }
+
+          // Send text-end event
+          writer.write({ type: "text-end", id: textPartId });
+
+          const structured = parseStructuredOutputFromText(accumulatedText);
+
+          await recordCapabilityRun({
+            timestamp: new Date().toISOString(),
+            requestId,
+            agentId: selectedAgentId,
+            outcome: "success",
+            durationMs: Date.now() - startedAt,
+            structuredType: structured?.type ?? null,
+            schemaValid: Boolean(structured),
+          });
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Unknown stream error";
+
+          await recordCapabilityRun({
+            timestamp: new Date().toISOString(),
+            requestId,
+            agentId: selectedAgentId,
+            outcome: "failure",
+            durationMs: Date.now() - startedAt,
+            structuredType: null,
+            schemaValid: false,
+            errorMessage,
+          });
+
+          throw error;
         }
-
-        // Send text-end event
-        writer.write({ type: "text-end", id: textPartId });
       },
       onError: (error) => {
         console.error("[API /chat] Stream error:", error);
@@ -52,6 +101,18 @@ export async function POST(req: Request) {
     console.error("[API /chat] Error:", error);
     const message =
       error instanceof Error ? error.message : "Unknown server error";
+
+    await recordCapabilityRun({
+      timestamp: new Date().toISOString(),
+      requestId,
+      agentId: "unknown",
+      outcome: "failure",
+      durationMs: Date.now() - startedAt,
+      structuredType: null,
+      schemaValid: false,
+      errorMessage: message,
+    });
+
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
