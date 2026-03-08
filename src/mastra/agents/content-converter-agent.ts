@@ -38,6 +38,10 @@ Create an assessment quiz to test understanding:
 - Generate 5-10 questions
 - Vary difficulty: 30% easy, 50% medium, 20% hard
 - Questions should test comprehension, not just memorization
+- Use EXACT quiz field names and casing:
+  - top-level: type, title, subject, difficulty, questions, totalQuestions
+  - per question: id, question, type, options (only for multiple_choice), correctAnswer, explanation
+  - Never use snake_case keys (for example, use correctAnswer not correct_answer)
 
 ### 3. Study Plan (type: "study-plan")
 Create a structured study plan to master the content:
