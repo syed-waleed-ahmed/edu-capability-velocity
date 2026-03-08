@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { StudyPackageCard } from "./StudyPackageCard";
-import { FlashcardDeckComponent } from "./FlashcardDeck";
-import { QuizRunner } from "./QuizRunner";
-import { StudyPlanView } from "./StudyPlanView";
+import { StudyPackageCard } from "./micro/StudyPackageCard";
+import { FlashcardDeckComponent } from "./micro/FlashcardDeck";
+import { QuizRunner } from "./micro/QuizRunner";
+import { StudyPlanView } from "./micro/StudyPlanView";
+import styles from "./StructuredRenderer.module.css";
 
 interface StructuredRendererProps {
   data: Record<string, unknown>;
@@ -33,27 +34,9 @@ export function StructuredRenderer({ data }: StructuredRendererProps) {
       return <StudyPlanView data={data as any} />;
     default:
       return (
-        <div
-          style={{
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: "12px",
-            padding: "16px",
-            fontFamily: "'Inter', sans-serif",
-            color: "#94a3b8",
-            fontSize: "13px",
-          }}
-        >
-          <p style={{ margin: "0 0 8px", fontWeight: 600, color: "#e2e8f0" }}>
-            📦 Structured Output
-          </p>
-          <pre
-            style={{
-              margin: 0,
-              whiteSpace: "pre-wrap",
-              fontSize: "12px",
-              lineHeight: "1.5",
-            }}
-          >
+        <div className={styles.fallback}>
+          <p className={styles.fallbackTitle}>📦 Structured Output</p>
+          <pre className={styles.fallbackCode}>
             {JSON.stringify(data, null, 2)}
           </pre>
         </div>

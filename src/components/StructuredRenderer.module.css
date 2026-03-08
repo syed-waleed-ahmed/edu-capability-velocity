@@ -1,0 +1,22 @@
+.fallback {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-base);
+  padding: var(--space-base);
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  animation: fadeInUp var(--transition-slow);
+}
+
+.fallbackTitle {
+  margin: 0 0 var(--space-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.fallbackCode {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}

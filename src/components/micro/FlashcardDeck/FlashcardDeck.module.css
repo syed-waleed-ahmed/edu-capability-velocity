@@ -1,0 +1,179 @@
+/* ============================================================
+   FlashcardDeck — CSS Module
+   ============================================================ */
+
+.deck {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  color: #fff;
+  font-family: var(--font-family);
+  max-width: 540px;
+  box-shadow: var(--shadow-card);
+  animation: fadeInUp var(--transition-slow);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.badge {
+  background: var(--color-accent-indigo-muted);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  color: #a5b4fc;
+}
+
+.deckTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: var(--space-sm) 0 0;
+}
+
+.stats {
+  text-align: right;
+}
+
+.progress {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: #a5b4fc;
+}
+
+.count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Progress bar */
+.progressBar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin-bottom: var(--space-lg);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent-indigo), var(--color-accent-purple));
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+/* Card */
+.card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-3xl) var(--space-xl);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-slow);
+  position: relative;
+}
+
+.cardFront {
+  composes: card;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  border: 1px solid var(--color-border);
+}
+
+.cardBack {
+  composes: card;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border: 1px solid var(--color-accent-indigo-border);
+}
+
+.diffBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: var(--space-2xs) var(--space-md);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-xs);
+  text-transform: capitalize;
+}
+
+.sideLabel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.cardText {
+  font-size: 17px;
+  line-height: var(--line-height-relaxed);
+  text-align: center;
+  margin: 0;
+}
+
+.flipHint {
+  margin-top: var(--space-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-faint);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-base);
+}
+
+.navButton {
+  background: var(--color-bg-hover);
+  border: none;
+  color: #fff;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family);
+  transition: all var(--transition-normal);
+}
+
+.navButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.navButtonNext {
+  composes: navButton;
+  background: linear-gradient(135deg, var(--color-accent-indigo), var(--color-accent-purple));
+}
+
+.navButtonNext:disabled {
+  background: var(--color-bg-hover);
+}
+
+.navCounter {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .deck {
+    padding: var(--space-lg);
+    max-width: 100%;
+  }
+
+  .card,
+  .cardFront,
+  .cardBack {
+    padding: var(--space-xl) var(--space-base);
+    min-height: 150px;
+  }
+}

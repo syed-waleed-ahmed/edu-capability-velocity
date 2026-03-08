@@ -1,0 +1,1 @@
+export { FlashcardDeckComponent } from "./FlashcardDeck";

@@ -1,0 +1,46 @@
+"use client";
+
+import { useChatContext } from "@/context/ChatContext";
+import { AGENTS } from "@/config/agents.config";
+import styles from "./ChatHeader.module.css";
+
+export function ChatHeader() {
+  const { selectedAgent, setSelectedAgentId } = useChatContext();
+
+  return (
+    <header className={styles.header}>
+      <div className={styles.brand}>
+        <span className={styles.brandIcon}>⚡</span>
+        <div>
+          <h1 className={styles.brandTitle}>EDU Capability Velocity</h1>
+          <p className={styles.brandSubtitle}>Micro-Experience Prototypes</p>
+        </div>
+      </div>
+
+      <div className={styles.agentTabs}>
+        {AGENTS.map((agent) => {
+          const isActive = selectedAgent.id === agent.id;
+          return (
+            <button
+              key={agent.id}
+              className={isActive ? styles.agentTabActive : styles.agentTab}
+              onClick={() => setSelectedAgentId(agent.id)}
+              style={
+                isActive
+                  ? {
+                      background: `${agent.color}22`,
+                      borderColor: `${agent.color}44`,
+                      color: agent.color,
+                    }
+                  : undefined
+              }
+            >
+              <span className={styles.tabIcon}>{agent.icon}</span>
+              {agent.name}
+            </button>
+          );
+        })}
+      </div>
+    </header>
+  );
+}

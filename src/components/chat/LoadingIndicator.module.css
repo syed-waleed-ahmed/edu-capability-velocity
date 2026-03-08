@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  gap: 6px;
+  padding: var(--space-md) 0;
+  align-items: center;
+  animation: fadeInUp var(--transition-slow);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  animation: pulse 1.2s infinite;
+}
+
+.text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,94 @@
+.header {
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-base) var(--space-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(10, 10, 15, 0.85);
+  height: var(--header-height);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.brandIcon {
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.brandTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.brandSubtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.agentTabs {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.agentTab {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--space-sm) var(--space-base);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-normal);
+}
+
+.agentTab:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+.agentTabActive {
+  composes: agentTab;
+}
+
+.tabIcon {
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    gap: var(--space-md);
+    height: auto;
+    padding: var(--space-md);
+  }
+
+  .agentTabs {
+    width: 100%;
+  }
+
+  .agentTab,
+  .agentTabActive {
+    flex: 1;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+}

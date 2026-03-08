@@ -1,0 +1,56 @@
+.wrapper {
+  margin-bottom: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp var(--transition-slow);
+}
+
+.wrapperUser {
+  composes: wrapper;
+  align-items: flex-end;
+}
+
+.wrapperAssistant {
+  composes: wrapper;
+  align-items: flex-start;
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.bubble {
+  padding: var(--space-lg) var(--space-lg);
+  max-width: 85%;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bubbleUser {
+  composes: bubble;
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-xs) var(--radius-lg);
+}
+
+.bubbleAssistant {
+  composes: bubble;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-xs);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .bubble,
+  .bubbleUser,
+  .bubbleAssistant {
+    max-width: 95%;
+    padding: var(--space-md) var(--space-base);
+    font-size: var(--font-size-base);
+  }
+}

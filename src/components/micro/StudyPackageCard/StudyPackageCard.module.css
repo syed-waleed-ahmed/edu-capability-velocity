@@ -1,0 +1,143 @@
+/* ============================================================
+   StudyPackageCard — CSS Module
+   ============================================================ */
+
+.card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  color: #fff;
+  font-family: var(--font-family);
+  max-width: 540px;
+  box-shadow: var(--shadow-card);
+  animation: fadeInUp var(--transition-slow);
+}
+
+.header {
+  margin-bottom: var(--space-xl);
+}
+
+.badge {
+  background: rgba(168, 85, 247, 0.2);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  color: #c4b5fd;
+}
+
+.packageTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: var(--space-sm) 0 0;
+}
+
+.summary {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-top: var(--space-sm);
+}
+
+/* Key Concepts */
+.concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.concept {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  color: #c4b5fd;
+}
+
+/* Sections */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.section {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.sectionHeader {
+  padding: var(--space-md) var(--space-base);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sectionHeader:hover {
+  background: var(--color-bg-hover);
+}
+
+.sectionToggle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.sectionBody {
+  padding: 0 var(--space-base) var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* Reading Order */
+.readingOrder {
+  margin-top: var(--space-xl);
+}
+
+.readingLabel {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.readingItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.readingNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: rgba(168, 85, 247, 0.2);
+  color: #c4b5fd;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .card {
+    padding: var(--space-lg);
+    max-width: 100%;
+  }
+}
