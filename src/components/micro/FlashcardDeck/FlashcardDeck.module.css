@@ -3,14 +3,14 @@
    ============================================================ */
 
 .deck {
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
+  background: linear-gradient(165deg, rgba(12, 24, 46, 0.9), rgba(14, 29, 55, 0.78));
+  border: 1px solid rgba(132, 180, 242, 0.28);
   border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
   color: #fff;
   font-family: var(--font-family);
   width: 100%;
-  max-width: 680px;
+  max-width: min(100%, 760px);
   box-shadow: var(--shadow-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -23,7 +23,12 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--gradient-card);
+  background: linear-gradient(
+    140deg,
+    rgba(52, 230, 207, 0.14),
+    rgba(102, 163, 255, 0.08) 58%,
+    rgba(255, 157, 63, 0.08)
+  );
   pointer-events: none;
   border-radius: inherit;
 }
@@ -75,7 +80,7 @@
 /* Progress bar */
 .progressBar {
   height: 3px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(134, 179, 241, 0.18);
   border-radius: 2px;
   margin-bottom: var(--space-lg);
   overflow: hidden;
@@ -112,8 +117,8 @@
 
 .cardFront {
   composes: card;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
+  background: rgba(12, 23, 43, 0.68);
+  border: 1px solid rgba(132, 178, 240, 0.24);
 }
 
 .cardFront:hover {
@@ -123,8 +128,13 @@
 
 .cardBack {
   composes: card;
-  background: var(--color-accent-muted);
-  border: 1px solid var(--color-accent-border);
+  background: linear-gradient(
+    140deg,
+    rgba(52, 230, 207, 0.2),
+    rgba(102, 163, 255, 0.2) 64%,
+    rgba(255, 157, 63, 0.18)
+  );
+  border: 1px solid rgba(132, 255, 235, 0.36);
 }
 
 .diffBadge {
@@ -173,8 +183,8 @@
 }
 
 .navButton {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: rgba(13, 24, 46, 0.8);
+  border: 1px solid rgba(131, 180, 242, 0.24);
   color: var(--color-text-secondary);
   padding: 10px var(--space-lg);
   border-radius: var(--radius-base);
@@ -213,8 +223,8 @@
 }
 
 .navButtonNext:disabled {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: rgba(13, 24, 46, 0.7);
+  border: 1px solid rgba(131, 180, 242, 0.2);
 }
 
 .navCounter {

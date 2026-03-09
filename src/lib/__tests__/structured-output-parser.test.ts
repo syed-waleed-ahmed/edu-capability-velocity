@@ -2,6 +2,79 @@ import { describe, expect, it } from "vitest";
 import { parseStructuredOutputFromText } from "@/lib/structured-output-parser";
 
 describe("parseStructuredOutputFromText", () => {
+  it("normalizes minimal flashcard payloads into schema-compliant decks", () => {
+    const rawText = JSON.stringify({
+      type: "flashcards",
+      cards: [
+        {
+          front: "What is photosynthesis?",
+          back: "Plants convert light into chemical energy.",
+          difficulty: "easy",
+        },
+        {
+          front: "Where does photosynthesis occur?",
+          back: "In chloroplasts.",
+          difficulty: "easy",
+        },
+        {
+          front: "Main pigment used in photosynthesis?",
+          back: "Chlorophyll.",
+          difficulty: "medium",
+        },
+        {
+          front: "Input gases for photosynthesis?",
+          back: "Carbon dioxide and water.",
+          difficulty: "medium",
+        },
+        {
+          front: "Main outputs of photosynthesis?",
+          back: "Glucose and oxygen.",
+          difficulty: "easy",
+        },
+      ],
+    });
+
+    const parsed = parseStructuredOutputFromText(rawText);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.type).toBe("flashcards");
+
+    if (parsed?.type === "flashcards") {
+      expect(parsed.deckTitle).toBe("General Flashcards");
+      expect(parsed.subject).toBe("General");
+      expect(parsed.totalCards).toBe(5);
+      expect(parsed.cards).toHaveLength(5);
+    }
+  });
+
+  it("parses JSON wrapped in code fences with smart quotes", () => {
+    const rawText = `\`\`\`json
+{
+  “type”: “flashcards”,
+  “deckTitle”: “Photosynthesis Essentials”,
+  “subject”: “Biology”,
+  “cards”: [
+    { “front”: “What is chlorophyll?”, “back”: “A green pigment in plants.”, “difficulty”: “easy” },
+    { “front”: “Where is chlorophyll found?”, “back”: “In chloroplasts.”, “difficulty”: “easy” },
+    { “front”: “Why is sunlight needed?”, “back”: “To drive the reaction.”, “difficulty”: “medium” },
+    { “front”: “Gas absorbed by plants?”, “back”: “Carbon dioxide.”, “difficulty”: “easy” },
+    { “front”: “Gas released by plants?”, “back”: “Oxygen.”, “difficulty”: “easy” }
+  ],
+  “totalCards”: 5
+}
+\`\`\``;
+
+    const parsed = parseStructuredOutputFromText(rawText);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.type).toBe("flashcards");
+
+    if (parsed?.type === "flashcards") {
+      expect(parsed.deckTitle).toBe("Photosynthesis Essentials");
+      expect(parsed.totalCards).toBe(5);
+    }
+  });
+
   it("normalizes quiz payloads that use snake_case answer keys", () => {
     const rawText = JSON.stringify({
       type: "quiz",

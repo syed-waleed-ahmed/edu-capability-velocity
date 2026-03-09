@@ -19,9 +19,17 @@ function getTextFromMessage(message: UIMessage): string {
     .join("");
 }
 
+function stripCodeFence(text: string): string {
+  const trimmed = text.trim();
+  const codeBlock = trimmed.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/i);
+
+  return codeBlock ? codeBlock[1].trim() : text;
+}
+
 export function ChatBubble({ message }: ChatBubbleProps) {
   const isUser = message.role === "user";
   const text = getTextFromMessage(message);
+  const fallbackText = !isUser ? stripCodeFence(text) : text;
   const structuredData = !isUser ? parseStructuredOutputFromText(text) : null;
 
   return (
@@ -36,7 +44,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
         <div
           className={isUser ? styles.bubbleUser : styles.bubbleAssistant}
         >
-          {text || "..."}
+          {fallbackText || "..."}
         </div>
       )}
     </div>

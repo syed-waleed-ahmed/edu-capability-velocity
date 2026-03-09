@@ -18,6 +18,37 @@ function asString(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function normalizeJSONText(text: string): string {
+  return text
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/\u00A0/g, " ");
+}
+
+function tryParseJSON(text: string): unknown | null {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    // Continue with normalized quote fallback.
+  }
+
+  const normalized = normalizeJSONText(trimmed);
+  if (normalized !== trimmed) {
+    try {
+      return JSON.parse(normalized);
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
 function stripOptionPrefix(option: string): string {
   return option.replace(/^[A-Z]\s*[).:-]\s*/i, "").trim();
 }
@@ -140,12 +171,90 @@ function normalizeQuizPayload(payload: JsonRecord): JsonRecord {
   };
 }
 
+function normalizeFlashcard(card: unknown): JsonRecord | null {
+  if (!isRecord(card)) {
+    return null;
+  }
+
+  const front =
+    asString(card.front) ??
+    asString(card.question) ??
+    asString(card.prompt) ??
+    asString(card.term) ??
+    null;
+  const back =
+    asString(card.back) ??
+    asString(card.answer) ??
+    asString(card.definition) ??
+    asString(card.explanation) ??
+    null;
+
+  if (!front || !back) {
+    return null;
+  }
+
+  return {
+    front,
+    back,
+    difficulty: normalizeDifficulty(card.difficulty),
+  };
+}
+
+function normalizeFlashcardsPayload(payload: JsonRecord): JsonRecord {
+  const rawCards = Array.isArray(payload.cards)
+    ? payload.cards
+    : Array.isArray(payload.flashcards)
+      ? payload.flashcards
+      : [];
+
+  const cards = rawCards
+    .map((card) => normalizeFlashcard(card))
+    .filter((card): card is JsonRecord => Boolean(card));
+
+  const subject = asString(payload.subject) ?? "General";
+
+  return {
+    type: "flashcards",
+    deckTitle:
+      asString(payload.deckTitle) ??
+      asString(payload.deck_title) ??
+      asString(payload.title) ??
+      `${subject} Flashcards`,
+    subject,
+    cards,
+    totalCards:
+      typeof payload.totalCards === "number"
+        ? payload.totalCards
+        : typeof payload.total_cards === "number"
+          ? payload.total_cards
+          : cards.length,
+  };
+}
+
 function normalizeStructuredCandidate(value: unknown): unknown {
   if (!isRecord(value)) {
     return value;
   }
 
-  return value.type === "quiz" ? normalizeQuizPayload(value) : value;
+  const type = asString(value.type)?.toLowerCase();
+
+  if (type === "quiz") {
+    return normalizeQuizPayload(value);
+  }
+
+  if (type === "flashcards" || type === "flashcard") {
+    return normalizeFlashcardsPayload(value);
+  }
+
+  if (!type && Array.isArray(value.questions)) {
+    return normalizeQuizPayload(value);
+  }
+
+  if (!type && (Array.isArray(value.cards) || Array.isArray(value.flashcards))) {
+    return normalizeFlashcardsPayload(value);
+  }
+
+  return value;
 }
 
 function extractFirstJSONObject(text: string): string | null {
@@ -201,18 +310,16 @@ function parseJSONCandidate(text: string): unknown | null {
     return null;
   }
 
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    // Continue with best-effort extraction strategies.
+  const direct = tryParseJSON(trimmed);
+  if (direct) {
+    return direct;
   }
 
   const jsonMatch = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/i);
   if (jsonMatch) {
-    try {
-      return JSON.parse(jsonMatch[1]);
-    } catch {
-      // Continue with inline extraction.
+    const fromFence = tryParseJSON(jsonMatch[1]);
+    if (fromFence) {
+      return fromFence;
     }
   }
 
@@ -221,11 +328,7 @@ function parseJSONCandidate(text: string): unknown | null {
     return null;
   }
 
-  try {
-    return JSON.parse(firstJSONObject);
-  } catch {
-    return null;
-  }
+  return tryParseJSON(firstJSONObject);
 }
 
 export function parseStructuredOutputFromText(

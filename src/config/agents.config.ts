@@ -13,7 +13,7 @@ export const AGENTS: AgentConfig[] = [
     name: "Content Converter",
     icon: "🔄",
     description: "Text → Flashcards, Quizzes, Study Plans",
-    color: "#8b5cf6",
+    color: "#34e6cf",
     suggestions: [
       "Generate flashcards about photosynthesis",
       "Create a quiz on World War II",
@@ -25,7 +25,7 @@ export const AGENTS: AgentConfig[] = [
     name: "Study Package",
     icon: "📚",
     description: "Files → Structured Study Package",
-    color: "#22c55e",
+    color: "#80ef9a",
     suggestions: [
       "Create a study package from my notes",
       "Summarize and organize study material",
@@ -36,7 +36,7 @@ export const AGENTS: AgentConfig[] = [
     name: "Drive Import",
     icon: "📂",
     description: "Google Drive → Structured Study Package",
-    color: "#3b82f6",
+    color: "#66a3ff",
     suggestions: [
       "Import files from Drive folder 1A2B3C and create a study package",
       "List files in my Drive folder and build a revision package",

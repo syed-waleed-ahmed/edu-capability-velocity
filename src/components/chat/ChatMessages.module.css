@@ -1,20 +1,39 @@
 .container {
   flex: 1;
   overflow-y: auto;
-  max-width: var(--max-width-chat);
-  margin: 0 auto;
-  padding: var(--space-xl);
-  padding-bottom: var(--space-base);
+  max-width: none;
+  margin: 0;
+  padding: clamp(14px, 2vw, 24px) clamp(12px, 5vw, 84px);
+  padding-bottom: var(--space-lg);
   width: 100%;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
+  scroll-padding-bottom: var(--space-xl);
+  scrollbar-gutter: stable;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border: 1px solid rgba(130, 180, 242, 0.14);
+  background: linear-gradient(
+    180deg,
+    rgba(11, 20, 36, 0.62) 0%,
+    rgba(11, 20, 36, 0.46) 50%,
+    rgba(11, 20, 36, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
 }
 
 .hasMessages {
   composes: container;
   justify-content: flex-start;
+  gap: var(--space-xs);
 }
 
 .empty {
@@ -22,11 +41,28 @@
   justify-content: center;
 }
 
+@media (max-width: 980px) {
+  .container,
+  .hasMessages,
+  .empty {
+    padding-top: var(--space-base);
+    padding-left: clamp(10px, 3vw, 32px);
+    padding-right: clamp(10px, 3vw, 32px);
+  }
+}
+
 @media (max-width: 640px) {
   .container,
   .hasMessages,
   .empty {
-    padding: var(--space-base);
-    padding-bottom: var(--space-sm);
+    padding: var(--space-base) var(--space-sm);
+    padding-bottom: var(--space-md);
+    border-radius: 0;
+  }
+
+  .container::before,
+  .hasMessages::before,
+  .empty::before {
+    border-radius: 16px;
   }
 }

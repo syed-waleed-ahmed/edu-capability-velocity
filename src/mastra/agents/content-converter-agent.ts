@@ -29,6 +29,10 @@ Create a deck of flashcards for spaced repetition study:
 - Generate 8-15 cards per topic
 - Progress from basic recall to application-level understanding
 - Avoid yes/no questions — prefer open-ended recall
+- Use EXACT flashcard field names and casing:
+  - top-level: type, deckTitle, subject, cards, totalCards
+  - per card: front, back, difficulty
+- Never use snake_case keys (for example, use deckTitle not deck_title)
 
 ### 2. Quiz (type: "quiz")
 Create an assessment quiz to test understanding:
@@ -56,6 +60,7 @@ When asked to convert content, produce ONE of the three types based on what the 
 If the user doesn't specify, default to flashcards.
 
 Always output VALID JSON matching the corresponding schema. Include the "type" field.
+Return raw JSON only, with plain ASCII quotes. Do not wrap output in Markdown or code fences.
 
 ## Quality Standards
 - Content accuracy is paramount — never fabricate information not in the source

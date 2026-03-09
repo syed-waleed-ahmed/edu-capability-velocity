@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EDU Capability Velocity | AI Learning Micro-Experiences",
+  title: "EDU Capability Velocity | Intelligent Study Studio",
   description:
-    "Transform text into interactive flashcards, quizzes, and study plans with AI-powered agents. Built with Mastra, Next.js, and the AI SDK.",
+    "A modern AI learning studio that transforms prompts into interactive quizzes, flashcards, study plans, and source-grounded study packages.",
   keywords: [
     "AI learning",
     "flashcards",
@@ -37,7 +43,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html
+      lang="en"
+      className={`${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

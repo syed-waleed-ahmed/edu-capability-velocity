@@ -1,5 +1,5 @@
 .wrapper {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -21,36 +21,44 @@
 .label {
   font-size: var(--font-size-2xs);
   color: var(--color-text-faint);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-mono);
 }
 
 .bubble {
   padding: var(--space-base) var(--space-lg);
-  max-width: 85%;
+  max-width: min(88%, 780px);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   white-space: pre-wrap;
   word-break: break-word;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .bubbleUser {
   composes: bubble;
-  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xs) var(--radius-xl);
-  background: rgba(139, 92, 246, 0.12);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.08);
+  border-radius: 20px 20px 8px 20px;
+  background: linear-gradient(
+    132deg,
+    rgba(52, 230, 207, 0.2),
+    rgba(102, 163, 255, 0.18) 60%,
+    rgba(255, 157, 63, 0.14)
+  );
+  border: 1px solid rgba(120, 255, 238, 0.34);
+  box-shadow: 0 18px 36px rgba(9, 32, 57, 0.42);
 }
 
 .bubbleAssistant {
   composes: bubble;
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xs);
+  background: linear-gradient(135deg, rgba(12, 23, 41, 0.88), rgba(15, 29, 53, 0.8));
+  border: 1px solid rgba(134, 174, 231, 0.34);
+  border-radius: 20px 20px 20px 8px;
 }
 
 /* ─── Responsive ─── */
@@ -58,7 +66,12 @@
   .bubble,
   .bubbleUser,
   .bubbleAssistant {
-    max-width: 92%;
+    max-width: 96%;
     padding: var(--space-md) var(--space-base);
+    font-size: var(--font-size-sm);
+  }
+
+  .wrapper {
+    margin-bottom: var(--space-lg);
   }
 }

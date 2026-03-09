@@ -5,12 +5,12 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 680px;
+  max-width: min(100%, 760px);
 }
 
 .sourcePanel {
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
+  background: linear-gradient(165deg, rgba(12, 24, 47, 0.9), rgba(16, 30, 57, 0.76));
+  border: 1px solid rgba(132, 180, 242, 0.28);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   box-shadow: var(--shadow-card);
@@ -19,9 +19,9 @@
 
 .badge {
   display: inline-flex;
-  background: rgba(59, 130, 246, 0.18);
-  border: 1px solid rgba(59, 130, 246, 0.32);
-  color: #bfdbfe;
+  background: rgba(102, 163, 255, 0.24);
+  border: 1px solid rgba(102, 163, 255, 0.38);
+  color: #dce9ff;
   border-radius: var(--radius-pill);
   padding: 4px 10px;
   font-size: var(--font-size-xs);
@@ -51,8 +51,8 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(11, 22, 42, 0.7);
+  border: 1px solid rgba(132, 178, 240, 0.24);
   border-radius: var(--radius-md);
   padding: 8px 10px;
 }

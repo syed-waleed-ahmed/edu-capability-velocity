@@ -1,16 +1,21 @@
 .container {
   display: flex;
   gap: 8px;
-  padding: var(--space-md) 0;
+  padding: var(--space-md) var(--space-base);
   align-items: center;
   animation: fadeIn 0.4s ease;
   position: relative;
   z-index: 1;
+  width: fit-content;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(132, 177, 235, 0.24);
+  background: rgba(12, 24, 47, 0.68);
+  box-shadow: var(--shadow-sm);
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: var(--radius-full);
   animation: pulse 1.4s ease-in-out infinite;
   box-shadow: 0 0 8px currentColor;
@@ -19,5 +24,7 @@
 .text {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-  font-style: italic;
+  font-family: var(--font-family-mono);
+  font-style: normal;
+  letter-spacing: 0.04em;
 }
