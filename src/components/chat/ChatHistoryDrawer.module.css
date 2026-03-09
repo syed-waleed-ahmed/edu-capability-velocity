@@ -1,20 +1,32 @@
-.mobileBackdrop,
-.mobileBackdropVisible {
+.backdrop,
+.backdropVisible {
+  display: none;
+}
+
+.backdropVisible {
   display: none;
 }
 
 .sidebar,
 .sidebarOpen {
-  width: min(360px, 100%);
-  height: 100%;
+  position: fixed;
+  inset: var(--header-height) auto 0 0;
+  z-index: 36;
+  width: min(360px, 95vw);
+  height: calc(100dvh - var(--header-height));
   background: var(--color-bg-surface);
-  border-left: 1px solid var(--color-border);
-  box-shadow: -12px 0 26px rgba(16, 34, 57, 0.1);
+  border-right: 1px solid var(--color-border);
+  box-shadow: 18px 0 34px rgba(11, 22, 37, 0.24);
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-lg);
-  z-index: 36;
+  transform: translateX(-104%);
+  transition: transform var(--transition-spring);
+}
+
+.sidebarOpen {
+  transform: translateX(0);
 }
 
 .header {
@@ -44,10 +56,13 @@
   border: 1px solid var(--color-border);
   background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  border-radius: var(--radius-pill);
-  padding: 7px var(--space-md);
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
   cursor: pointer;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-base);
   font-family: var(--font-family-mono);
   transition: all var(--transition-fast);
 }
@@ -59,7 +74,7 @@
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-sm);
 }
 
@@ -78,9 +93,11 @@
 }
 
 .primaryAction {
+  justify-content: flex-start;
   background: var(--gradient-accent);
   color: #fff;
   box-shadow: 0 10px 22px rgba(31, 95, 191, 0.2);
+  padding-left: var(--space-base);
 }
 
 .primaryAction:hover {
@@ -99,8 +116,29 @@
 }
 
 .actionIcon {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   line-height: 1;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.listTitle {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  font-family: var(--font-family-mono);
+}
+
+.listHeader .secondaryAction {
+  padding: 6px var(--space-md);
+  font-size: var(--font-size-xs);
 }
 
 .emptyState {
@@ -191,17 +229,47 @@
   place-items: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
 }
 
-.iconButton:hover {
+.iconButton:hover,
+.iconButton:focus-visible {
   color: var(--color-accent);
   border-color: var(--color-accent-border);
 }
 
-.iconButtonDanger:hover {
+.iconButtonDanger:hover,
+.iconButtonDanger:focus-visible {
   color: #dc6e60;
   border-color: rgba(194, 68, 52, 0.35);
   background: rgba(194, 68, 52, 0.12);
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.renameEditor {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.renameInput {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  padding: 7px var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+}
+
+.renameActions {
+  display: inline-flex;
+  gap: 6px;
 }
 
 .sessionMeta {
@@ -265,13 +333,27 @@
   background: rgba(31, 95, 191, 0.1);
 }
 
+@media (max-width: 640px) {
+  .sidebar,
+  .sidebarOpen {
+    inset: 0 auto 0 0;
+    height: 100dvh;
+    width: 100%;
+    padding: var(--space-base);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+}
+
 @media (max-width: 1080px) {
-  .mobileBackdrop,
-  .mobileBackdropVisible {
+  .backdrop,
+  .backdropVisible {
     position: fixed;
     inset: 0;
     z-index: 34;
-    background: rgba(9, 18, 30, 0.44);
+    background: rgba(10, 18, 31, 0.38);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
     opacity: 0;
@@ -280,39 +362,8 @@
     display: block;
   }
 
-  .mobileBackdropVisible {
+  .backdropVisible {
     opacity: 1;
     pointer-events: auto;
-  }
-
-  .sidebar,
-  .sidebarOpen {
-    position: fixed;
-    right: 0;
-    top: 0;
-    transform: translateX(104%);
-    transition: transform var(--transition-spring);
-    width: min(360px, 96vw);
-    height: 100dvh;
-  }
-
-  .sidebarOpen {
-    transform: translateX(0);
-  }
-}
-
-@media (max-width: 640px) {
-  .sidebar,
-  .sidebarOpen {
-    width: 100%;
-    padding: var(--space-base);
-  }
-
-  .actions {
-    grid-template-columns: 1fr;
-  }
-
-  .title {
-    font-size: var(--font-size-xl);
   }
 }

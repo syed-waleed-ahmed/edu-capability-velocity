@@ -1,5 +1,6 @@
 "use client";
 
+import { KeyboardEvent, useState } from "react";
 import { getAgentById } from "@/config/agents.config";
 import { useChatContext } from "@/context/ChatContext";
 import styles from "./ChatHistoryDrawer.module.css";
@@ -33,13 +34,18 @@ export function ChatHistoryDrawer() {
     setTheme,
   } = useChatContext();
 
-  const handleRename = (sessionId: string, title: string) => {
-    const renamed = window.prompt("Rename chat", title)?.trim();
-    if (!renamed) {
-      return;
-    }
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
 
-    renameHistorySession(sessionId, renamed);
+  const handleCloseDrawer = () => {
+    setEditingSessionId(null);
+    setDraftTitle("");
+    closeHistory();
+  };
+
+  const beginRename = (sessionId: string, title: string) => {
+    setEditingSessionId(sessionId);
+    setDraftTitle(title);
   };
 
   const handleDelete = (sessionId: string) => {
@@ -52,13 +58,50 @@ export function ChatHistoryDrawer() {
     }
 
     deleteHistorySession(sessionId);
+
+    if (editingSessionId === sessionId) {
+      setEditingSessionId(null);
+      setDraftTitle("");
+    }
+  };
+
+  const saveRename = (sessionId: string) => {
+    const nextTitle = draftTitle.trim();
+    if (!nextTitle) {
+      return;
+    }
+
+    renameHistorySession(sessionId, nextTitle);
+    setEditingSessionId(null);
+    setDraftTitle("");
+  };
+
+  const cancelRename = () => {
+    setEditingSessionId(null);
+    setDraftTitle("");
+  };
+
+  const handleRenameKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>,
+    sessionId: string
+  ) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      saveRename(sessionId);
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelRename();
+    }
   };
 
   return (
     <>
       <div
-        className={isHistoryOpen ? styles.mobileBackdropVisible : styles.mobileBackdrop}
-        onClick={closeHistory}
+        className={isHistoryOpen ? styles.backdropVisible : styles.backdrop}
+        onClick={handleCloseDrawer}
         role="presentation"
       />
 
@@ -74,10 +117,10 @@ export function ChatHistoryDrawer() {
           <button
             type="button"
             className={styles.closeButton}
-            onClick={closeHistory}
+            onClick={handleCloseDrawer}
             aria-label="Close history"
           >
-            Close
+            ✕
           </button>
         </div>
 
@@ -91,8 +134,16 @@ export function ChatHistoryDrawer() {
             <span className={styles.actionIcon}>✚</span>
             New chat
           </button>
-          <button type="button" className={styles.secondaryAction} onClick={clearHistory}>
-            Clear history
+        </div>
+
+        <div className={styles.listHeader}>
+          <p className={styles.listTitle}>Recent chats</p>
+          <button
+            type="button"
+            className={styles.secondaryAction}
+            onClick={clearHistory}
+          >
+            Clear all
           </button>
         </div>
 
@@ -112,22 +163,55 @@ export function ChatHistoryDrawer() {
                     className={isActive ? styles.sessionItemActive : styles.sessionItem}
                   >
                     <div className={styles.sessionTopRow}>
-                      <button
-                        type="button"
-                        className={styles.sessionMain}
-                        onClick={() => openHistorySession(session.id)}
-                      >
-                        <span className={styles.sessionTitle}>{session.title}</span>
-                        <span className={styles.sessionTime}>
-                          {formatTimestamp(session.updatedAt)}
-                        </span>
-                      </button>
+                      {editingSessionId === session.id ? (
+                        <div className={styles.renameEditor}>
+                          <input
+                            value={draftTitle}
+                            onChange={(event) => setDraftTitle(event.target.value)}
+                            onKeyDown={(event) => handleRenameKeyDown(event, session.id)}
+                            className={styles.renameInput}
+                            autoFocus
+                            aria-label={`Rename ${session.title}`}
+                          />
+                          <div className={styles.renameActions}>
+                            <button
+                              type="button"
+                              className={styles.iconButton}
+                              onClick={() => saveRename(session.id)}
+                              aria-label="Save rename"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.iconButton}
+                              onClick={cancelRename}
+                              aria-label="Cancel rename"
+                            >
+                              ↺
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={styles.sessionMain}
+                          onClick={() => openHistorySession(session.id)}
+                        >
+                          <span className={styles.sessionTitle}>{session.title}</span>
+                          <span className={styles.sessionTime}>
+                            {formatTimestamp(session.updatedAt)}
+                          </span>
+                        </button>
+                      )}
+
                       <div className={styles.sessionActions}>
                         <button
                           type="button"
                           className={styles.iconButton}
                           aria-label={`Rename ${session.title}`}
-                          onClick={() => handleRename(session.id, session.title)}
+                          onClick={() => beginRename(session.id, session.title)}
+                          disabled={editingSessionId === session.id}
                         >
                           ✏
                         </button>
@@ -154,7 +238,7 @@ export function ChatHistoryDrawer() {
         )}
 
         <div className={styles.footer}>
-          <p className={styles.footerLabel}>Theme</p>
+          <p className={styles.footerLabel}>Appearance</p>
           <div className={styles.themeSwitch}>
             <button
               type="button"

@@ -403,7 +403,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setActiveSessionId("");
     setMessages([]);
     setInputText("");
-    setIsHistoryOpen(false);
   }, [setMessages]);
 
   const clearMessages = useCallback(() => {
@@ -431,8 +430,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         persistSessions(reorderedSessions);
         return reorderedSessions;
       });
-
-      setIsHistoryOpen(false);
     },
     [sessions, setMessages]
   );
@@ -444,10 +441,12 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const renamedSessions = sessions.map((session) =>
-        session.id === sessionId
-          ? { ...session, title: nextTitle, updatedAt: new Date().toISOString() }
-          : session
+      const renamedSessions = clampSessions(
+        sessions.map((session) =>
+          session.id === sessionId
+            ? { ...session, title: nextTitle, updatedAt: new Date().toISOString() }
+            : session
+        )
       );
 
       setSessions(renamedSessions);
@@ -491,7 +490,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages([]);
     setInputText("");
     persistSessions([]);
-    setIsHistoryOpen(false);
   }, [setMessages]);
 
   const historySessions = useMemo<ChatHistorySessionSummary[]>(() => {
