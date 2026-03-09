@@ -15,8 +15,11 @@ import { AGENTS, getAgentById, type AgentConfig } from "@/config/agents.config";
 import type { UIMessage } from "ai";
 
 const CHAT_HISTORY_STORAGE_KEY = "edu-capability-velocity:chat-history:v1";
+const THEME_STORAGE_KEY = "edu-capability-velocity:theme:v1";
 const MAX_CHAT_SESSIONS = 30;
 const MAX_SESSION_MESSAGES = 120;
+
+type ThemeMode = "light" | "dark";
 
 interface StoredChatMessage {
   id: string;
@@ -30,6 +33,14 @@ interface ChatSession {
   agentId: string;
   updatedAt: string;
   messages: StoredChatMessage[];
+}
+
+interface InitialChatState {
+  sessions: ChatSession[];
+  activeSessionId: string;
+  agentId: string;
+  initialMessages: UIMessage[];
+  theme: ThemeMode;
 }
 
 export interface ChatHistorySessionSummary {
@@ -92,6 +103,16 @@ function deriveSessionTitle(agentId: string, messages: StoredChatMessage[]): str
   return `${getAgentById(agentId).name} chat`;
 }
 
+function clampSessions(sessions: ChatSession[]): ChatSession[] {
+  return sessions
+    .filter((session) => session.messages.length > 0)
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )
+    .slice(0, MAX_CHAT_SESSIONS);
+}
+
 function parseStoredSessions(value: string | null): ChatSession[] {
   if (!value) {
     return [];
@@ -146,10 +167,52 @@ function parseStoredSessions(value: string | null): ChatSession[] {
       }
     }
 
-    return validSessions.slice(0, MAX_CHAT_SESSIONS);
+    return clampSessions(validSessions);
   } catch {
     return [];
   }
+}
+
+function getInitialTheme(): ThemeMode {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function loadInitialState(): InitialChatState {
+  const defaultAgentId = AGENTS[0].id;
+
+  if (typeof window === "undefined") {
+    return {
+      sessions: [],
+      activeSessionId: "",
+      agentId: defaultAgentId,
+      initialMessages: [],
+      theme: "light",
+    };
+  }
+
+  const sessions = parseStoredSessions(
+    window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
+  );
+  const activeSession = sessions[0];
+
+  return {
+    sessions,
+    activeSessionId: activeSession?.id ?? "",
+    agentId: activeSession?.agentId ?? defaultAgentId,
+    initialMessages: activeSession ? toUiMessages(activeSession.messages) : [],
+    theme: getInitialTheme(),
+  };
 }
 
 function persistSessions(sessions: ChatSession[]): void {
@@ -158,16 +221,6 @@ function persistSessions(sessions: ChatSession[]): void {
   }
 
   window.localStorage.setItem(CHAT_HISTORY_STORAGE_KEY, JSON.stringify(sessions));
-}
-
-function createNewSession(agentId: string): ChatSession {
-  return {
-    id: createSessionId(),
-    title: `${getAgentById(agentId).name} chat`,
-    agentId,
-    updatedAt: new Date().toISOString(),
-    messages: [],
-  };
 }
 
 interface ChatContextValue {
@@ -187,10 +240,17 @@ interface ChatContextValue {
   historySessions: ChatHistorySessionSummary[];
   activeSessionId: string;
   openHistorySession: (sessionId: string) => void;
+  renameHistorySession: (sessionId: string, title: string) => void;
+  deleteHistorySession: (sessionId: string) => void;
   clearHistory: () => void;
   isHistoryOpen: boolean;
   toggleHistory: () => void;
   closeHistory: () => void;
+
+  /* Theme */
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  toggleTheme: () => void;
 
   /* Input */
   inputText: string;
@@ -200,22 +260,27 @@ interface ChatContextValue {
 const ChatContext = createContext<ChatContextValue | null>(null);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const [agentId, setAgentId] = useState(AGENTS[0].id);
+  const [initialState] = useState<InitialChatState>(() => loadInitialState());
+  const [agentId, setAgentId] = useState(initialState.agentId);
   const [inputText, setInputText] = useState("");
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState("");
+  const [sessions, setSessions] = useState<ChatSession[]>(initialState.sessions);
+  const [activeSessionId, setActiveSessionId] = useState(
+    initialState.activeSessionId
+  );
+  const [theme, setThemeState] = useState<ThemeMode>(initialState.theme);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const hasHydratedHistory = useRef(false);
+  const activeSessionIdRef = useRef(initialState.activeSessionId);
   const selectedAgent = getAgentById(agentId);
 
   const chat = useMemo(
     () =>
       new Chat({
+        messages: initialState.initialMessages,
         transport: new DefaultChatTransport({
           api: "/api/chat",
         }),
       }),
-    []
+    [initialState.initialMessages]
   );
 
   const {
@@ -226,95 +291,120 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   } = useChat({ chat });
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    activeSessionIdRef.current = activeSessionId;
+  }, [activeSessionId]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
       return;
     }
 
-    const loadedSessions = parseStoredSessions(
-      window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
-    );
+    document.documentElement.setAttribute("data-theme", theme);
 
-    if (loadedSessions.length > 0) {
-      const latestSession = loadedSessions[0];
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSessions(loadedSessions);
-      setActiveSessionId(latestSession.id);
-      setAgentId(latestSession.agentId);
-      setMessages(toUiMessages(latestSession.messages));
-    } else {
-      const initialSession = createNewSession(AGENTS[0].id);
-      const initialSessions = [initialSession];
-      setSessions(initialSessions);
-      setActiveSessionId(initialSession.id);
-      setMessages([]);
-      persistSessions(initialSessions);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
     }
-
-    hasHydratedHistory.current = true;
-  }, [setMessages]);
+  }, [theme]);
 
   useEffect(() => {
-    if (!hasHydratedHistory.current || !activeSessionId) {
+    const sessionId = activeSessionIdRef.current;
+    if (!sessionId) {
       return;
     }
 
     const storedMessages = toStoredMessages(messages);
+    if (storedMessages.length === 0) {
+      return;
+    }
+
     const nowIso = new Date().toISOString();
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions((previousSessions) => {
       const existingSession = previousSessions.find(
-        (session) => session.id === activeSessionId
+        (session) => session.id === sessionId
       );
 
       const nextSession: ChatSession = {
-        id: activeSessionId,
+        id: sessionId,
         agentId,
         updatedAt: nowIso,
-        title:
-          storedMessages.length > 0
-            ? deriveSessionTitle(agentId, storedMessages)
-            : (existingSession?.title ?? `${selectedAgent.name} chat`),
+        title: (() => {
+          const fallbackTitle = `${selectedAgent.name} chat`;
+          if (!existingSession) {
+            return deriveSessionTitle(agentId, storedMessages);
+          }
+
+          const hasCustomTitle =
+            existingSession.title !== fallbackTitle &&
+            !existingSession.title.endsWith(" chat");
+
+          if (hasCustomTitle) {
+            return existingSession.title;
+          }
+
+          return deriveSessionTitle(agentId, storedMessages);
+        })(),
         messages: storedMessages,
       };
 
-      const mergedSessions = [
+      const mergedSessions = clampSessions([
         nextSession,
-        ...previousSessions.filter((session) => session.id !== activeSessionId),
-      ].slice(0, MAX_CHAT_SESSIONS);
+        ...previousSessions.filter((session) => session.id !== sessionId),
+      ]);
 
       persistSessions(mergedSessions);
       return mergedSessions;
     });
-  }, [messages, agentId, activeSessionId, selectedAgent.name]);
+  }, [messages, agentId, selectedAgent.name]);
+
+  const ensureActiveSession = useCallback(
+    (seedText: string): string => {
+      const currentSessionId = activeSessionIdRef.current;
+      if (currentSessionId) {
+        return currentSessionId;
+      }
+
+      const nextSession: ChatSession = {
+        id: createSessionId(),
+        title: seedText.trim().slice(0, 60) || `${selectedAgent.name} chat`,
+        agentId,
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+
+      activeSessionIdRef.current = nextSession.id;
+      setActiveSessionId(nextSession.id);
+      setSessions((previousSessions) => {
+        const mergedSessions = clampSessions([nextSession, ...previousSessions]);
+        persistSessions(mergedSessions);
+        return mergedSessions;
+      });
+
+      return nextSession.id;
+    },
+    [agentId, selectedAgent.name]
+  );
 
   const sendMessage = useCallback(
     async (opts: { text: string }) => {
+      ensureActiveSession(opts.text);
+
       await rawSendMessage(opts, {
         body: { agent: agentId },
       });
     },
-    [rawSendMessage, agentId]
+    [rawSendMessage, agentId, ensureActiveSession]
   );
 
   const isLoading = status === "streaming" || status === "submitted";
 
   const startNewChat = useCallback(() => {
-    const newSession = createNewSession(agentId);
-
-    setActiveSessionId(newSession.id);
+    activeSessionIdRef.current = "";
+    setActiveSessionId("");
     setMessages([]);
     setInputText("");
-    setSessions((previousSessions) => {
-      const mergedSessions = [newSession, ...previousSessions].slice(
-        0,
-        MAX_CHAT_SESSIONS
-      );
-      persistSessions(mergedSessions);
-      return mergedSessions;
-    });
     setIsHistoryOpen(false);
-  }, [agentId, setMessages]);
+  }, [setMessages]);
 
   const clearMessages = useCallback(() => {
     startNewChat();
@@ -329,14 +419,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
       setAgentId(targetSession.agentId);
       setActiveSessionId(targetSession.id);
+      activeSessionIdRef.current = targetSession.id;
       setMessages(toUiMessages(targetSession.messages));
       setInputText("");
 
       setSessions((previousSessions) => {
-        const reorderedSessions = [
+        const reorderedSessions = clampSessions([
           targetSession,
           ...previousSessions.filter((session) => session.id !== targetSession.id),
-        ];
+        ]);
         persistSessions(reorderedSessions);
         return reorderedSessions;
       });
@@ -346,17 +437,62 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     [sessions, setMessages]
   );
 
-  const clearHistory = useCallback(() => {
-    const freshSession = createNewSession(agentId);
-    const freshSessions = [freshSession];
+  const renameHistorySession = useCallback(
+    (sessionId: string, title: string) => {
+      const nextTitle = title.trim();
+      if (!nextTitle) {
+        return;
+      }
 
-    setSessions(freshSessions);
-    setActiveSessionId(freshSession.id);
+      const renamedSessions = sessions.map((session) =>
+        session.id === sessionId
+          ? { ...session, title: nextTitle, updatedAt: new Date().toISOString() }
+          : session
+      );
+
+      setSessions(renamedSessions);
+      persistSessions(renamedSessions);
+    },
+    [sessions]
+  );
+
+  const deleteHistorySession = useCallback(
+    (sessionId: string) => {
+      const remainingSessions = sessions.filter(
+        (session) => session.id !== sessionId
+      );
+
+      setSessions(remainingSessions);
+      persistSessions(remainingSessions);
+
+      if (activeSessionIdRef.current !== sessionId) {
+        return;
+      }
+
+      const nextActive = remainingSessions[0];
+      if (nextActive) {
+        activeSessionIdRef.current = nextActive.id;
+        setActiveSessionId(nextActive.id);
+        setAgentId(nextActive.agentId);
+        setMessages(toUiMessages(nextActive.messages));
+      } else {
+        activeSessionIdRef.current = "";
+        setActiveSessionId("");
+        setMessages([]);
+      }
+    },
+    [sessions, setMessages]
+  );
+
+  const clearHistory = useCallback(() => {
+    activeSessionIdRef.current = "";
+    setSessions([]);
+    setActiveSessionId("");
     setMessages([]);
     setInputText("");
-    persistSessions(freshSessions);
+    persistSessions([]);
     setIsHistoryOpen(false);
-  }, [agentId, setMessages]);
+  }, [setMessages]);
 
   const historySessions = useMemo<ChatHistorySessionSummary[]>(() => {
     return sessions.map((session) => {
@@ -380,6 +516,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setIsHistoryOpen(false);
   }, []);
 
+  const setTheme = useCallback((nextTheme: ThemeMode) => {
+    setThemeState(nextTheme);
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setThemeState((current) => (current === "light" ? "dark" : "light"));
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -394,10 +538,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         historySessions,
         activeSessionId,
         openHistorySession,
+        renameHistorySession,
+        deleteHistorySession,
         clearHistory,
         isHistoryOpen,
         toggleHistory,
         closeHistory,
+        theme,
+        setTheme,
+        toggleTheme,
         inputText,
         setInputText,
       }}

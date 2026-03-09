@@ -4,7 +4,7 @@
   z-index: 20;
   position: relative;
   flex-shrink: 0;
-  background: linear-gradient(0deg, rgba(243, 246, 251, 0.98) 32%, transparent);
+  background: linear-gradient(0deg, var(--color-bg-primary) 32%, transparent);
 }
 
 .form {

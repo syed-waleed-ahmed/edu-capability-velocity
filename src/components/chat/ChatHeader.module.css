@@ -9,7 +9,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(248, 251, 255, 0.86);
+  background: var(--glass-bg-strong);
   height: var(--header-height);
   gap: var(--space-base);
 }
@@ -88,9 +88,9 @@
 
 .historyButton,
 .historyButtonActive {
-  border: 1px solid rgba(25, 65, 118, 0.18);
-  background: rgba(255, 255, 255, 0.84);
-  color: var(--color-text-secondary);
+  border: 1px solid rgba(31, 95, 191, 0.28);
+  background: rgba(31, 95, 191, 0.12);
+  color: var(--color-accent);
   padding: 9px var(--space-md);
   border-radius: var(--radius-pill);
   cursor: pointer;
@@ -99,13 +99,21 @@
   font-family: var(--font-family-mono);
   transition: all var(--transition-normal);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .historyButton:hover,
 .historyButtonActive {
   color: var(--color-accent);
   border-color: var(--color-accent-border);
-  background: rgba(31, 95, 191, 0.1);
+  background: rgba(31, 95, 191, 0.2);
+}
+
+.historyIcon {
+  font-size: var(--font-size-sm);
+  line-height: 1;
 }
 
 .legalLinks {
@@ -154,26 +162,6 @@
 .agentTabActive {
   composes: agentTab;
   box-shadow: 0 0 0 1px rgba(31, 95, 191, 0.2);
-}
-
-.resetButton {
-  border: 1px solid rgba(25, 65, 118, 0.18);
-  background: rgba(255, 255, 255, 0.84);
-  color: var(--color-text-secondary);
-  padding: 9px var(--space-md);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  font-family: var(--font-family-mono);
-  transition: all var(--transition-normal);
-  white-space: nowrap;
-}
-
-.resetButton:hover {
-  color: var(--color-accent);
-  border-color: var(--color-border-hover);
-  background: var(--color-bg-hover);
 }
 
 .tabIcon {
@@ -246,11 +234,6 @@
     flex: 0 0 auto;
     justify-content: center;
     min-width: 140px;
-    padding: 10px var(--space-md);
-  }
-
-  .resetButton {
-    width: 100%;
     padding: 10px var(--space-md);
   }
 

@@ -9,7 +9,6 @@ export function ChatHeader() {
   const {
     selectedAgent,
     setSelectedAgentId,
-    startNewChat,
     toggleHistory,
     isHistoryOpen,
     historySessions,
@@ -56,16 +55,10 @@ export function ChatHeader() {
             type="button"
             className={isHistoryOpen ? styles.historyButtonActive : styles.historyButton}
             onClick={toggleHistory}
+            aria-label="Open chat history"
           >
-            History ({historySessions.length})
-          </button>
-
-          <button
-            type="button"
-            className={styles.resetButton}
-            onClick={startNewChat}
-          >
-            New chat
+            <span className={styles.historyIcon}>☰</span>
+            <span>History ({historySessions.length})</span>
           </button>
 
           <div className={styles.legalLinks}>
