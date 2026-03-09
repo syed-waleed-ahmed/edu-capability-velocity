@@ -15,6 +15,8 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
     "@ai-sdk/react": "^3.0.118",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/merriweather-sans": "^5.2.7",
     "@mastra/core": "^1.10.0",
     "ai": "^6.0.116",
     "next": "16.1.6",

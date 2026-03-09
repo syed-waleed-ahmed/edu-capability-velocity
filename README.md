@@ -35,11 +35,13 @@ Rendered micro-experiences:
 - Mastra + AI SDK v6
 - Zod schema validation
 - CSS Modules + design tokens
+- Self-hosted fonts via `@fontsource` (no build-time Google Fonts dependency)
 
 ## Runtime and Security Baseline
 
 - `POST /api/chat`
   - Optional API key auth (`COMMERCIAL_API_KEY`)
+  - Configurable auth mode (`COMMERCIAL_AUTH_MODE=strict|safe-browser`)
   - Request size/shape validation
   - Rate limiting (Upstash distributed backend or in-memory fallback)
 - `GET /api/health`
@@ -48,6 +50,7 @@ Rendered micro-experiences:
   - `/legal/terms`
   - `/legal/privacy`
 - Security headers configured in `next.config.ts`
+- Chat history persisted in browser `localStorage` and restored on reload
 
 ## Project Layout
 
@@ -85,6 +88,7 @@ Start from `.env.local.example`.
 | `OPENAI_API_KEY` | Yes | Model access for Mastra agents |
 | `GOOGLE_DRIVE_ACCESS_TOKEN` | Optional | Drive connector runtime token |
 | `COMMERCIAL_API_KEY` | Recommended in production | Protects `/api/chat` |
+| `COMMERCIAL_AUTH_MODE` | Optional | `strict` (default) or `safe-browser` for first-party browser chat |
 | `API_RATE_LIMIT_MAX_REQUESTS` | Optional | Per-window limit |
 | `API_RATE_LIMIT_WINDOW_MS` | Optional | Window duration |
 | `UPSTASH_REDIS_REST_URL` | Optional | Distributed rate-limit backend |
@@ -92,7 +96,9 @@ Start from `.env.local.example`.
 | `API_MAX_MESSAGES_PER_REQUEST` | Optional | Request message count guard |
 | `API_MAX_TEXT_CHARS_PER_REQUEST` | Optional | Total text-size guard |
 | `API_MAX_TEXT_CHARS_PER_MESSAGE` | Optional | Per-message text-size guard |
-| `CAPABILITY_TELEMETRY_FILE` | Optional | Telemetry output path |
+| `CAPABILITY_TELEMETRY_FILE` | Optional | Telemetry file path (`/tmp/...` default on Vercel) |
+| `CAPABILITY_TELEMETRY_HTTP_ENDPOINT` | Optional | External telemetry sink endpoint (POST JSON) |
+| `CAPABILITY_TELEMETRY_HTTP_TOKEN` | Optional | Bearer token for telemetry sink |
 
 ## Local Setup
 

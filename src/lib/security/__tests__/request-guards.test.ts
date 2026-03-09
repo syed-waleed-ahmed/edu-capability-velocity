@@ -8,6 +8,7 @@ import {
 
 const originalEnv = {
   COMMERCIAL_API_KEY: process.env.COMMERCIAL_API_KEY,
+  COMMERCIAL_AUTH_MODE: process.env.COMMERCIAL_AUTH_MODE,
   API_RATE_LIMIT_MAX_REQUESTS: process.env.API_RATE_LIMIT_MAX_REQUESTS,
   API_RATE_LIMIT_WINDOW_MS: process.env.API_RATE_LIMIT_WINDOW_MS,
   API_MAX_MESSAGES_PER_REQUEST: process.env.API_MAX_MESSAGES_PER_REQUEST,
@@ -16,6 +17,7 @@ const originalEnv = {
 
 afterEach(() => {
   process.env.COMMERCIAL_API_KEY = originalEnv.COMMERCIAL_API_KEY;
+  process.env.COMMERCIAL_AUTH_MODE = originalEnv.COMMERCIAL_AUTH_MODE;
   process.env.API_RATE_LIMIT_MAX_REQUESTS = originalEnv.API_RATE_LIMIT_MAX_REQUESTS;
   process.env.API_RATE_LIMIT_WINDOW_MS = originalEnv.API_RATE_LIMIT_WINDOW_MS;
   process.env.API_MAX_MESSAGES_PER_REQUEST = originalEnv.API_MAX_MESSAGES_PER_REQUEST;
@@ -38,6 +40,7 @@ describe("request guards", () => {
 
   it("rejects request with missing API key when commercial mode is enabled", () => {
     process.env.COMMERCIAL_API_KEY = "secret-key";
+    process.env.COMMERCIAL_AUTH_MODE = "strict";
 
     const request = new Request("http://localhost/api/chat", {
       method: "POST",
@@ -49,6 +52,25 @@ describe("request guards", () => {
     if (!result.ok) {
       expect(result.failure.status).toBe(401);
     }
+  });
+
+  it("accepts same-origin browser requests in safe-browser auth mode", () => {
+    process.env.COMMERCIAL_API_KEY = "secret-key";
+    process.env.COMMERCIAL_AUTH_MODE = "safe-browser";
+
+    const request = new Request("https://app.example.com/api/chat", {
+      method: "POST",
+      headers: {
+        origin: "https://app.example.com",
+        host: "app.example.com",
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-mode": "cors",
+        "user-agent": "Mozilla/5.0",
+      },
+    });
+
+    const result = enforceCommercialApiKey(request);
+    expect(result.ok).toBe(true);
   });
 
   it("limits burst requests by client IP", async () => {

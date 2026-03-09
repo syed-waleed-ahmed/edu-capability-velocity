@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Merriweather_Sans } from "next/font/google";
+import "@fontsource/merriweather-sans/400.css";
+import "@fontsource/merriweather-sans/500.css";
+import "@fontsource/merriweather-sans/600.css";
+import "@fontsource/merriweather-sans/700.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource/ibm-plex-mono/600.css";
 import "./globals.css";
-
-const merriweatherSans = Merriweather_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-merriweather-sans",
-  display: "swap",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-ibm-plex-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "EDU Capability Velocity | Academic Learning Workspace",
@@ -45,10 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${merriweatherSans.variable} ${ibmPlexMono.variable}`}
-    >
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

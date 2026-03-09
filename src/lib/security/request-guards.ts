@@ -17,6 +17,8 @@ interface UpstashConfig {
   restToken: string;
 }
 
+type CommercialAuthMode = "strict" | "safe-browser";
+
 interface JsonRecord {
   [key: string]: unknown;
 }
@@ -51,6 +53,11 @@ export type BodyValidationResult =
 
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
+function getCommercialAuthMode(): CommercialAuthMode {
+  const rawMode = process.env.COMMERCIAL_AUTH_MODE?.trim().toLowerCase();
+  return rawMode === "safe-browser" ? "safe-browser" : "strict";
+}
+
 function parsePositiveInt(value: string | undefined, fallback: number): number {
   if (!value) return fallback;
 
@@ -82,6 +89,49 @@ function secureCompare(expected: string, provided: string): boolean {
   }
 
   return timingSafeEqual(expectedBuffer, providedBuffer);
+}
+
+function getRequestOrigin(request: Request): string | null {
+  const explicitOrigin = request.headers.get("origin")?.trim();
+  if (explicitOrigin) {
+    return explicitOrigin.toLowerCase();
+  }
+
+  return null;
+}
+
+function getExpectedOrigin(request: Request): string | null {
+  const forwardedHost = request.headers.get("x-forwarded-host")?.trim();
+  const host = forwardedHost ?? request.headers.get("host")?.trim();
+
+  if (!host) {
+    return null;
+  }
+
+  const proto = request.headers.get("x-forwarded-proto")?.trim() ?? "https";
+  return `${proto.toLowerCase()}://${host.toLowerCase()}`;
+}
+
+function isSafeBrowserRequest(request: Request): boolean {
+  const origin = getRequestOrigin(request);
+  const expectedOrigin = getExpectedOrigin(request);
+
+  if (!origin || !expectedOrigin || origin !== expectedOrigin) {
+    return false;
+  }
+
+  const fetchSite = request.headers.get("sec-fetch-site")?.trim().toLowerCase();
+  const fetchMode = request.headers.get("sec-fetch-mode")?.trim().toLowerCase();
+  const userAgent = request.headers.get("user-agent")?.trim().toLowerCase();
+
+  const acceptedFetchSite = ["same-origin", "same-site", "none"].includes(
+    fetchSite ?? ""
+  );
+  const acceptedFetchMode =
+    !fetchMode || ["cors", "same-origin", "navigate"].includes(fetchMode);
+  const looksLikeBrowser = Boolean(userAgent && userAgent.includes("mozilla"));
+
+  return acceptedFetchSite && acceptedFetchMode && looksLikeBrowser;
 }
 
 function collectTextPartsLength(message: JsonRecord): number {
@@ -243,6 +293,7 @@ export function getClientIp(request: Request): string {
 
 export function enforceCommercialApiKey(request: Request): GuardResult {
   const configuredApiKey = process.env.COMMERCIAL_API_KEY?.trim();
+  const authMode = getCommercialAuthMode();
 
   if (!configuredApiKey) {
     return { ok: true };
@@ -257,6 +308,10 @@ export function enforceCommercialApiKey(request: Request): GuardResult {
   const providedKey = headerApiKey ?? bearerToken;
 
   if (providedKey && secureCompare(configuredApiKey, providedKey)) {
+    return { ok: true };
+  }
+
+  if (authMode === "safe-browser" && isSafeBrowserRequest(request)) {
     return { ok: true };
   }
 

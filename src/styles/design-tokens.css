@@ -73,8 +73,8 @@
   --color-diff-hard-border: rgba(172, 67, 58, 0.32);
 
   /* ─── Typography ─── */
-  --font-family: var(--font-merriweather-sans), "Segoe UI", sans-serif;
-  --font-family-mono: var(--font-ibm-plex-mono), "SFMono-Regular", ui-monospace,
+  --font-family: "Merriweather Sans", "Segoe UI", sans-serif;
+  --font-family-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace,
     monospace;
   --font-size-2xs: 10px;
   --font-size-xs: 11px;
