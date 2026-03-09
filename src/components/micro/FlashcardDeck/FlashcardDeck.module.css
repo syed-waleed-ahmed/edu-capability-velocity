@@ -3,11 +3,11 @@
    ============================================================ */
 
 .deck {
-  background: linear-gradient(165deg, rgba(12, 24, 46, 0.9), rgba(14, 29, 55, 0.78));
-  border: 1px solid rgba(132, 180, 242, 0.28);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: var(--font-family);
   width: 100%;
   max-width: min(100%, 760px);
@@ -23,12 +23,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    140deg,
-    rgba(52, 230, 207, 0.14),
-    rgba(102, 163, 255, 0.08) 58%,
-    rgba(255, 157, 63, 0.08)
-  );
+  background: var(--gradient-card);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -117,8 +112,8 @@
 
 .cardFront {
   composes: card;
-  background: rgba(12, 23, 43, 0.68);
-  border: 1px solid rgba(132, 178, 240, 0.24);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
 }
 
 .cardFront:hover {
@@ -128,13 +123,8 @@
 
 .cardBack {
   composes: card;
-  background: linear-gradient(
-    140deg,
-    rgba(52, 230, 207, 0.2),
-    rgba(102, 163, 255, 0.2) 64%,
-    rgba(255, 157, 63, 0.18)
-  );
-  border: 1px solid rgba(132, 255, 235, 0.36);
+  background: linear-gradient(140deg, rgba(31, 95, 191, 0.1), rgba(47, 118, 221, 0.08));
+  border: 1px solid var(--color-accent-border);
 }
 
 .diffBadge {
@@ -183,8 +173,8 @@
 }
 
 .navButton {
-  background: rgba(13, 24, 46, 0.8);
-  border: 1px solid rgba(131, 180, 242, 0.24);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   padding: 10px var(--space-lg);
   border-radius: var(--radius-base);
@@ -212,24 +202,68 @@
   composes: navButton;
   background: var(--gradient-accent);
   border-color: transparent;
-  color: #fff;
+  color: #ffffff;
 }
 
 .navButtonNext:hover:not(:disabled) {
   box-shadow: var(--shadow-glow);
   border-color: transparent;
   background: var(--gradient-accent-hover);
-  color: #fff;
+  color: #ffffff;
 }
 
 .navButtonNext:disabled {
-  background: rgba(13, 24, 46, 0.7);
-  border: 1px solid rgba(131, 180, 242, 0.2);
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
 }
 
 .navCounter {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.results {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: var(--space-2xl) var(--space-base);
+}
+
+.resultsEmoji {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-base);
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  font-size: 34px;
+  background: linear-gradient(
+    140deg,
+    rgba(31, 95, 191, 0.14),
+    rgba(47, 118, 221, 0.12)
+  );
+  border: 1px solid rgba(31, 95, 191, 0.28);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.resultsTitle {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-2xl);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.resultsText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+.resultsActions {
+  margin-top: var(--space-xl);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 /* ─── Responsive ─── */
@@ -245,5 +279,9 @@
   .cardBack {
     padding: var(--space-xl) var(--space-base);
     min-height: 150px;
+  }
+
+  .resultsActions {
+    flex-direction: column;
   }
 }

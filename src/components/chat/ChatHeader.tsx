@@ -14,7 +14,7 @@ export function ChatHeader() {
         <span className={styles.brandIcon}>⚡</span>
         <div>
           <h1 className={styles.brandTitle}>EDU Capability Velocity</h1>
-          <p className={styles.brandSubtitle}>Micro-Experience Prototypes</p>
+          <p className={styles.brandSubtitle}>Structured Learning Workspace</p>
         </div>
       </div>
 

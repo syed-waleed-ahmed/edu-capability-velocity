@@ -1,6 +1,6 @@
 .fallback {
-  background: linear-gradient(165deg, rgba(12, 23, 43, 0.86), rgba(17, 30, 55, 0.74));
-  border: 1px solid rgba(131, 180, 242, 0.32);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   font-family: var(--font-family);
@@ -15,7 +15,7 @@
 .fallbackTitle {
   margin: 0 0 var(--space-base);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-accent-light);
+  color: var(--color-accent);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-mono);
   letter-spacing: 0.05em;
@@ -26,5 +26,5 @@
   white-space: pre-wrap;
   font-size: var(--font-size-xs);
   line-height: var(--line-height-normal);
-  color: rgba(198, 223, 252, 0.82);
+  color: var(--color-text-secondary);
 }

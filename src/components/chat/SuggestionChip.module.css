@@ -1,8 +1,8 @@
 .chip {
-  background: linear-gradient(150deg, rgba(16, 31, 56, 0.84), rgba(17, 31, 58, 0.68));
-  border: 1px solid rgba(127, 174, 234, 0.26);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--glass-border);
   padding: 11px var(--space-lg);
-  border-radius: 14px;
+  border-radius: 10px;
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
   color: var(--color-text-secondary);
@@ -27,14 +27,14 @@
 }
 
 .chip:hover {
-  border-color: rgba(132, 255, 235, 0.48);
-  color: #eaffff;
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(8, 21, 43, 0.56);
+  box-shadow: var(--shadow-sm);
 }
 
 .chip:hover::before {
-  opacity: 0.12;
+  opacity: 0.04;
 }
 
 .chip:active {

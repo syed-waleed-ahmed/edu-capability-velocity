@@ -14,22 +14,6 @@
   scrollbar-gutter: stable;
 }
 
-.container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  border: 1px solid rgba(130, 180, 242, 0.14);
-  background: linear-gradient(
-    180deg,
-    rgba(11, 20, 36, 0.62) 0%,
-    rgba(11, 20, 36, 0.46) 50%,
-    rgba(11, 20, 36, 0.2) 100%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
-
 .hasMessages {
   composes: container;
   justify-content: flex-start;
@@ -58,11 +42,5 @@
     padding: var(--space-base) var(--space-sm);
     padding-bottom: var(--space-md);
     border-radius: 0;
-  }
-
-  .container::before,
-  .hasMessages::before,
-  .empty::before {
-    border-radius: 16px;
   }
 }

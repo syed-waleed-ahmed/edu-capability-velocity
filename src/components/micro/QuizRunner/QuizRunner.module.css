@@ -3,11 +3,11 @@
    ============================================================ */
 
 .quiz {
-  background: linear-gradient(165deg, rgba(13, 26, 48, 0.9), rgba(15, 32, 57, 0.76));
-  border: 1px solid rgba(133, 180, 241, 0.28);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-2xl);
   padding: var(--space-2xl);
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: var(--font-family);
   width: 100%;
   max-width: min(100%, 760px);
@@ -23,12 +23,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 157, 63, 0.16),
-    rgba(102, 163, 255, 0.09) 52%,
-    rgba(52, 230, 207, 0.1)
-  );
+  background: var(--gradient-card);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -66,7 +61,7 @@
 .progressCurrent {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, #ff9d3f, #66a3ff);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -84,10 +79,10 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #ff9d3f, #66a3ff, #34e6cf);
+  background: var(--gradient-accent);
   border-radius: 2px;
   transition: width var(--transition-slow);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 8px var(--color-accent-glow);
 }
 
 /* Question */
@@ -100,7 +95,7 @@
 }
 
 .questionNumber {
-  color: #ffd2a0;
+  color: var(--color-accent);
   margin-right: var(--space-sm);
 }
 
@@ -114,8 +109,8 @@
 }
 
 .option {
-  background: rgba(13, 24, 44, 0.72);
-  border: 1px solid rgba(132, 178, 240, 0.24);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-md) var(--space-base);
   cursor: pointer;
@@ -162,7 +157,7 @@
   width: 24px;
   height: 24px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(31, 95, 191, 0.08);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   flex-shrink: 0;
@@ -185,8 +180,8 @@
   width: 100%;
   min-height: 96px;
   resize: vertical;
-  background: rgba(10, 20, 39, 0.74);
-  border: 1px solid rgba(132, 178, 240, 0.24);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-base);
   color: var(--color-text-primary);
@@ -199,7 +194,7 @@
 .openEndedInput:focus {
   outline: none;
   border-color: var(--color-accent-border);
-  box-shadow: 0 0 0 3px rgba(52, 230, 207, 0.2);
+  box-shadow: var(--shadow-input-focus);
 }
 
 .openEndedInput:disabled {
@@ -207,8 +202,8 @@
 }
 
 .answerReview {
-  background: rgba(102, 163, 255, 0.14);
-  border: 1px solid rgba(102, 163, 255, 0.3);
+  background: rgba(31, 95, 191, 0.08);
+  border: 1px solid rgba(31, 95, 191, 0.18);
   border-radius: var(--radius-md);
   padding: var(--space-md) var(--space-base);
   margin-bottom: var(--space-base);
@@ -267,7 +262,7 @@
   background: var(--gradient-accent);
   background-size: 200% auto;
   border: none;
-  color: #fff;
+  color: #ffffff;
   padding: var(--space-md);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -311,7 +306,7 @@
 .resultsScore {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, #ff9d3f, #66a3ff, #34e6cf);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

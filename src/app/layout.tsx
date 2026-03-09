@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, Merriweather_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const merriweatherSans = Merriweather_Sans({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-merriweather-sans",
   display: "swap",
 });
 
-const jetBrainsMono = JetBrains_Mono({
+const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EDU Capability Velocity | Intelligent Study Studio",
+  title: "EDU Capability Velocity | Academic Learning Workspace",
   description:
-    "A modern AI learning studio that transforms prompts into interactive quizzes, flashcards, study plans, and source-grounded study packages.",
+    "A structured AI-powered education workspace for flashcards, quizzes, study plans, and source-grounded study packages.",
   keywords: [
     "AI learning",
     "flashcards",
@@ -45,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
+      className={`${merriweatherSans.variable} ${ibmPlexMono.variable}`}
     >
       <body>{children}</body>
     </html>

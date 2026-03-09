@@ -4,27 +4,22 @@
   z-index: 20;
   position: relative;
   flex-shrink: 0;
-  background: linear-gradient(
-    0deg,
-    rgba(4, 9, 21, 0.96) 22%,
-    rgba(4, 9, 21, 0.84) 55%,
-    transparent
-  );
+  background: linear-gradient(0deg, rgba(243, 246, 251, 0.98) 32%, transparent);
 }
 
 .form {
   width: min(100%, var(--max-width-chat));
   margin: 0 auto;
   display: flex;
-  gap: 12px;
-  background: linear-gradient(180deg, rgba(9, 18, 35, 0.92), rgba(13, 26, 48, 0.88));
-  border: 1px solid rgba(131, 178, 237, 0.28);
-  border-radius: 22px;
+  gap: 10px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
   padding: 8px 8px 8px var(--space-lg);
   backdrop-filter: var(--glass-blur-strong);
   -webkit-backdrop-filter: var(--glass-blur-strong);
   transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-  box-shadow: 0 24px 44px rgba(3, 10, 24, 0.54);
+  box-shadow: var(--shadow-sm);
 }
 
 .form:focus-within {
@@ -69,14 +64,14 @@
 
 .sendButton {
   border: none;
-  color: #03111a;
+  color: #ffffff;
   padding: 12px var(--space-xl);
-  border-radius: 16px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family-mono);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   transition: all var(--transition-normal);
   white-space: nowrap;
@@ -84,12 +79,12 @@
   background-size: 200% auto;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 28px rgba(52, 230, 207, 0.25);
+  box-shadow: 0 8px 16px rgba(31, 95, 191, 0.2);
 }
 
 .sendButton:hover:not(:disabled) {
   background-position: right center;
-  box-shadow: 0 14px 30px rgba(102, 163, 255, 0.34);
+  box-shadow: 0 10px 20px rgba(31, 95, 191, 0.24);
   transform: translateY(-1px);
 }
 

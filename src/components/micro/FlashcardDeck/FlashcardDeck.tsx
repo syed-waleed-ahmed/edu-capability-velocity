@@ -18,13 +18,27 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
+  const [finished, setFinished] = useState(false);
 
   const card = data.cards[currentIndex];
   const totalCards = data.totalCards || data.cards.length;
   const progress = ((completed.size / totalCards) * 100).toFixed(0);
+  const isLastCard = currentIndex === data.cards.length - 1;
+
+  const markCurrentCompleted = () => {
+    setCompleted((prev) => {
+      if (prev.has(currentIndex)) {
+        return prev;
+      }
+
+      const next = new Set(prev);
+      next.add(currentIndex);
+      return next;
+    });
+  };
 
   const handleNext = () => {
-    setCompleted((prev) => new Set([...prev, currentIndex]));
+    markCurrentCompleted();
     setIsFlipped(false);
     setCurrentIndex((prev) => Math.min(prev + 1, data.cards.length - 1));
   };
@@ -34,7 +48,57 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
+  const handleFinish = () => {
+    markCurrentCompleted();
+    setFinished(true);
+    setIsFlipped(false);
+  };
+
+  const handleReviewAgain = () => {
+    setFinished(false);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  };
+
+  const handleRestart = () => {
+    setFinished(false);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setCompleted(new Set());
+  };
+
   const diff = DIFF_COLORS[card.difficulty] || DIFF_COLORS.medium;
+
+  if (finished) {
+    return (
+      <div className={styles.deck}>
+        <div className={styles.results}>
+          <div className={styles.resultsEmoji}>✅</div>
+          <h2 className={styles.resultsTitle}>Deck complete</h2>
+          <p className={styles.resultsText}>
+            You reviewed {completed.size}/{totalCards} cards.
+          </p>
+
+          <div className={styles.resultsActions}>
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={handleReviewAgain}
+            >
+              Review again
+            </button>
+            <button
+              type="button"
+              className={styles.navButtonNext}
+              onClick={handleRestart}
+            >
+              Restart deck
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.deck}>
@@ -97,15 +161,10 @@ export function FlashcardDeckComponent({ data }: FlashcardDeckProps) {
           {currentIndex + 1} / {data.cards.length}
         </span>
         <button
-          className={
-            currentIndex === data.cards.length - 1
-              ? styles.navButton
-              : styles.navButtonNext
-          }
-          onClick={handleNext}
-          disabled={currentIndex === data.cards.length - 1}
+          className={styles.navButtonNext}
+          onClick={isLastCard ? handleFinish : handleNext}
         >
-          Next →
+          {isLastCard ? "Finish Deck" : "Next →"}
         </button>
       </div>
     </div>
