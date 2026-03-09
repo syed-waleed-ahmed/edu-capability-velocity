@@ -9,6 +9,9 @@ Use this checklist before launching EDU Capability Velocity to external users.
 - Set request throttling values:
   - `API_RATE_LIMIT_MAX_REQUESTS`
   - `API_RATE_LIMIT_WINDOW_MS`
+- For multi-instance/serverless deployments, configure distributed throttling:
+  - `UPSTASH_REDIS_REST_URL`
+  - `UPSTASH_REDIS_REST_TOKEN`
 - Enforce payload limits:
   - `API_MAX_MESSAGES_PER_REQUEST`
   - `API_MAX_TEXT_CHARS_PER_REQUEST`
@@ -20,6 +23,10 @@ Use this checklist before launching EDU Capability Velocity to external users.
 - Enable telemetry output (`CAPABILITY_TELEMETRY_FILE`).
 - Run weekly KPI generation (`npm run kpi:report`) and review trends.
 - Configure alerting for elevated failure rates and latency regressions.
+- Verify GitHub Actions deployment workflow is configured with:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
 
 ## 3. Legal and Compliance
 

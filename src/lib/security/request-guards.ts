@@ -12,6 +12,11 @@ interface RateLimitEntry {
   resetAtMs: number;
 }
 
+interface UpstashConfig {
+  restUrl: string;
+  restToken: string;
+}
+
 interface JsonRecord {
   [key: string]: unknown;
 }
@@ -109,6 +114,117 @@ function pruneRateLimitStore(nowMs: number): void {
   }
 }
 
+function getUpstashConfig(): UpstashConfig | null {
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const restToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+
+  if (!restUrl || !restToken) {
+    return null;
+  }
+
+  return {
+    restUrl: restUrl.replace(/\/$/, ""),
+    restToken,
+  };
+}
+
+function createRateLimitFailure(
+  nowMs: number,
+  resetAtMs: number,
+  maxRequests: number
+): GuardResult {
+  const retryAfterSeconds = Math.max(1, Math.ceil((resetAtMs - nowMs) / 1000));
+
+  return {
+    ok: false,
+    failure: {
+      status: 429,
+      error: "Rate limit exceeded",
+      headers: {
+        "Retry-After": String(retryAfterSeconds),
+        "X-RateLimit-Limit": String(maxRequests),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": String(Math.ceil(resetAtMs / 1000)),
+      },
+    },
+  };
+}
+
+function enforceInMemoryRateLimit(
+  identifier: string,
+  nowMs: number,
+  maxRequests: number,
+  windowMs: number
+): GuardResult {
+  const current = rateLimitStore.get(identifier);
+  const active =
+    current && current.resetAtMs > nowMs
+      ? current
+      : { count: 0, resetAtMs: nowMs + windowMs };
+
+  active.count += 1;
+  rateLimitStore.set(identifier, active);
+  pruneRateLimitStore(nowMs);
+
+  if (active.count <= maxRequests) {
+    return { ok: true };
+  }
+
+  return createRateLimitFailure(nowMs, active.resetAtMs, maxRequests);
+}
+
+async function enforceDistributedRateLimit(
+  identifier: string,
+  nowMs: number,
+  maxRequests: number,
+  windowMs: number
+): Promise<GuardResult | null> {
+  const upstashConfig = getUpstashConfig();
+  if (!upstashConfig) {
+    return null;
+  }
+
+  const windowStartMs = Math.floor(nowMs / windowMs) * windowMs;
+  const resetAtMs = windowStartMs + windowMs;
+  const key = `api:chat:rl:${identifier}:${windowStartMs}`;
+
+  try {
+    const response = await fetch(`${upstashConfig.restUrl}/pipeline`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${upstashConfig.restToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([["INCR", key], ["PEXPIRE", key, windowMs]]),
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const body = (await response.json()) as unknown;
+    if (!Array.isArray(body) || body.length < 1) {
+      return null;
+    }
+
+    const incrementResult = asRecord(body[0]);
+    const count = Number.parseInt(String(incrementResult?.result ?? ""), 10);
+
+    if (!Number.isFinite(count) || count < 1) {
+      return null;
+    }
+
+    if (count <= maxRequests) {
+      return { ok: true };
+    }
+
+    return createRateLimitFailure(nowMs, resetAtMs, maxRequests);
+  } catch {
+    return null;
+  }
+}
+
 export function getClientIp(request: Request): string {
   const xForwardedFor = request.headers.get("x-forwarded-for");
   if (xForwardedFor) {
@@ -156,10 +272,10 @@ export function enforceCommercialApiKey(request: Request): GuardResult {
   };
 }
 
-export function enforceRateLimit(
+export async function enforceRateLimit(
   request: Request,
   nowMs: number = Date.now()
-): GuardResult {
+): Promise<GuardResult> {
   const maxRequests = parsePositiveInt(
     process.env.API_RATE_LIMIT_MAX_REQUESTS,
     DEFAULT_RATE_LIMIT_MAX_REQUESTS
@@ -171,38 +287,17 @@ export function enforceRateLimit(
 
   const identifier = getClientIp(request);
 
-  const current = rateLimitStore.get(identifier);
-  const active =
-    current && current.resetAtMs > nowMs
-      ? current
-      : { count: 0, resetAtMs: nowMs + windowMs };
-
-  active.count += 1;
-  rateLimitStore.set(identifier, active);
-  pruneRateLimitStore(nowMs);
-
-  if (active.count <= maxRequests) {
-    return { ok: true };
+  const distributedResult = await enforceDistributedRateLimit(
+    identifier,
+    nowMs,
+    maxRequests,
+    windowMs
+  );
+  if (distributedResult) {
+    return distributedResult;
   }
 
-  const retryAfterSeconds = Math.max(
-    1,
-    Math.ceil((active.resetAtMs - nowMs) / 1000)
-  );
-
-  return {
-    ok: false,
-    failure: {
-      status: 429,
-      error: "Rate limit exceeded",
-      headers: {
-        "Retry-After": String(retryAfterSeconds),
-        "X-RateLimit-Limit": String(maxRequests),
-        "X-RateLimit-Remaining": "0",
-        "X-RateLimit-Reset": String(Math.ceil(active.resetAtMs / 1000)),
-      },
-    },
-  };
+  return enforceInMemoryRateLimit(identifier, nowMs, maxRequests, windowMs);
 }
 
 export function validateChatRequestBody(body: unknown): BodyValidationResult {

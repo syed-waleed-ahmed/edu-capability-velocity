@@ -1,6 +1,6 @@
 # EDU Capability Velocity
 
-> AI-powered learning micro-experiences — transform text into interactive flashcards, quizzes, and study plans in seconds.
+AI-powered learning workspace that turns free-form content into structured micro-experiences (flashcards, quizzes, study plans, and study packages).
 
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
@@ -9,111 +9,94 @@
 
 ## Overview
 
-EDU Capability Velocity is a production-ready AI learning platform that converts natural language into structured, interactive learning materials. Built with a **micro-experience architecture**, each capability (flashcards, quizzes, study plans, study packages) is a self-contained, reusable module with its own schema, UI component, and rendering pipeline.
+EDU Capability Velocity is built around a capability pipeline:
 
-### Features
+`capability -> Mastra module -> schema-validated JSON -> UI component`
 
-- **🔄 Content Converter Agent** — Generate flashcards, quizzes, and study plans from any topic
-- **📚 Study Package Agent** — Create structured study packages from notes
-- **📂 Drive Import Agent** — Import Google Drive files into structured study packages
-- **🃏 Interactive Flashcards** — Flip cards, track progress, navigate decks
-- **📝 Quiz Runner** — Multiple-choice quizzes with scoring and explanations
-- **📋 Study Plans** — Day-by-day learning schedules with milestones
-- **📦 Study Packages** — Organized sections with key concepts and reading order
-- **📈 Capability Telemetry + KPI Report** — Capture runtime metrics and generate weekly capability reports
+The application includes:
+
+- `content-converter-agent` for flashcards, quizzes, and study plans.
+- `study-package-agent` for structured package generation.
+- `drive-study-package-agent` for Google Drive grounded package creation.
+- Capability telemetry and KPI reporting artifacts under `docs/capability-velocity/`.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript 5 |
-| AI Agents | Mastra + OpenAI GPT-4o-mini |
-| Streaming | AI SDK v6 (UIMessageStream) |
-| Schemas | Zod (structured output validation) |
-| Styling | CSS Modules + CSS Custom Properties |
-| Font | Inter (via next/font) |
-| Deployment | Vercel |
+- Framework: Next.js 16 (App Router)
+- Language: TypeScript 5
+- AI Runtime: Mastra + AI SDK v6
+- Validation: Zod schemas
+- UI: React 19 + CSS Modules + design tokens
+- Deployment target: Vercel
 
-## Quick Start
+## Current Production Baseline
 
-```bash
-# 1. Install dependencies
-npm install
+- Structured rendering reliability hardening for model output variants.
+- `/api/chat` request guards:
+  - Optional API key auth (`COMMERCIAL_API_KEY`)
+  - Rate limiting (distributed Upstash support + in-memory fallback)
+  - Payload shape and size validation
+- Health endpoint: `/api/health`
+- Legal routes:
+  - `/legal`
+  - `/legal/terms`
+  - `/legal/privacy`
+- Security headers configured in `next.config.ts`.
 
-# 2. Set up environment variables
-cp .env.local.example .env.local
-# PowerShell alternative:
-# Copy-Item .env.local.example .env.local
-# Add your OPENAI_API_KEY to .env.local
+## Project Structure
 
-# 3. Run development server
-npm run dev
+```text
+src/
+  app/
+    api/chat/route.ts
+    api/health/route.ts
+    legal/
+    layout.tsx
+    page.tsx
+  components/
+    chat/
+    micro/
+    StructuredRenderer.tsx
+  config/agents.config.ts
+  context/ChatContext.tsx
+  lib/
+    security/request-guards.ts
+    structured-output-parser.ts
+    telemetry/capability-telemetry.ts
+  mastra/
+    agents/
+    tools/
+  schemas/
+  styles/design-tokens.css
 ```
-
-Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `OPENAI_API_KEY` | ✅ | OpenAI API key for GPT-4o-mini |
-| `GOOGLE_DRIVE_ACCESS_TOKEN` | Optional | OAuth access token for Drive connector tools |
-| `COMMERCIAL_API_KEY` | Recommended (Prod) | Protects `/api/chat` (send via `x-api-key` or `Authorization: Bearer`) |
-| `API_RATE_LIMIT_MAX_REQUESTS` | Optional | Max chat requests allowed per rate-limit window (default `30`) |
-| `API_RATE_LIMIT_WINDOW_MS` | Optional | Rate-limit window duration in milliseconds (default `60000`) |
-| `API_MAX_MESSAGES_PER_REQUEST` | Optional | Maximum message count accepted by `/api/chat` (default `40`) |
-| `API_MAX_TEXT_CHARS_PER_REQUEST` | Optional | Maximum cumulative text characters per chat request (default `40000`) |
-| `API_MAX_TEXT_CHARS_PER_MESSAGE` | Optional | Maximum text characters for a single message in chat history (default `8000`) |
-| `CAPABILITY_TELEMETRY_FILE` | Optional | Custom output path for telemetry NDJSON (defaults to `artifacts/telemetry/capability-events.ndjson`) |
+Copy `.env.local.example` to `.env.local`.
 
-## Architecture
+| Variable | Required | Purpose |
+|---|---|---|
+| `OPENAI_API_KEY` | Yes | Model access for Mastra agents |
+| `GOOGLE_DRIVE_ACCESS_TOKEN` | Optional | Drive connector capability |
+| `COMMERCIAL_API_KEY` | Recommended (prod) | Protect `/api/chat` with key auth |
+| `API_RATE_LIMIT_MAX_REQUESTS` | Optional | Per-window request limit |
+| `API_RATE_LIMIT_WINDOW_MS` | Optional | Rate limit window duration |
+| `UPSTASH_REDIS_REST_URL` | Optional (recommended on Vercel) | Distributed rate limiting backend |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional (recommended on Vercel) | Upstash REST token |
+| `API_MAX_MESSAGES_PER_REQUEST` | Optional | Max messages accepted per request |
+| `API_MAX_TEXT_CHARS_PER_REQUEST` | Optional | Total text budget per request |
+| `API_MAX_TEXT_CHARS_PER_MESSAGE` | Optional | Per-message text budget |
+| `CAPABILITY_TELEMETRY_FILE` | Optional | Telemetry NDJSON output path |
 
+## Local Development
+
+```bash
+npm install
+cp .env.local.example .env.local
+npm run dev
 ```
-src/
-├── app/                         # Next.js App Router
-│   ├── layout.tsx               # Root layout (Inter font, SEO metadata)
-│   ├── page.tsx                 # Entry point (5 lines)
-│   ├── globals.css              # Global styles + keyframe animations
-│   └── api/chat/route.ts        # Chat API (Mastra → AI SDK v6 bridge)
-├── styles/
-│   └── design-tokens.css        # Design system (100+ CSS custom properties)
-├── config/
-│   └── agents.config.ts         # Agent definitions + suggestion prompts
-├── context/
-│   └── ChatContext.tsx           # Shared state provider (agent, chat, input)
-├── components/
-│   ├── chat/                    # Chat UI (8 components + CSS Modules)
-│   │   ├── ChatLayout.tsx       # Main shell (flex column layout)
-│   │   ├── ChatHeader.tsx       # Brand + agent selector tabs
-│   │   ├── ChatMessages.tsx     # Message list with auto-scroll
-│   │   ├── ChatBubble.tsx       # Message bubble (user vs assistant)
-│   │   ├── ChatInput.tsx        # Glass input bar + gradient send button
-│   │   ├── EmptyState.tsx       # Welcome screen with suggestion chips
-│   │   ├── SuggestionChip.tsx   # Clickable prompt pill
-│   │   └── LoadingIndicator.tsx # Pulsing "thinking" indicator
-│   ├── micro/                   # Micro-experience renderers
-│   │   ├── FlashcardDeck/       # Interactive flashcard UI
-│   │   ├── QuizRunner/          # Quiz with scoring + explanations
-│   │   ├── StudyPlanView/       # Day-by-day study schedule
-│   │   ├── StudyPackageCard/    # Organized study materials
-│   │   └── DriveStudyPackageCard/ # Drive import source + study package view
-│   └── StructuredRenderer.tsx   # JSON → UI dispatcher (type registry)
-├── lib/
-│   ├── structured-output-parser.ts
-│   └── telemetry/
-│       └── capability-telemetry.ts # Runtime capability telemetry hooks
-├── schemas/                     # Zod schemas for structured AI output
-│   ├── drive-study-package.ts
-│   ├── flashcard.ts
-│   ├── quiz.ts
-│   ├── study-plan.ts
-│   ├── study-package.ts
-│   └── structured-output.ts
-└── mastra/                      # Mastra agent + tool definitions
-    ├── agents/
-    └── tools/
-```
+
+Open `http://localhost:3000`.
 
 ## Quality Gates
 
@@ -124,84 +107,69 @@ npm run test
 npm run build
 ```
 
-CI runs these checks on push and pull requests via `.github/workflows/ci.yml`.
+## CI/CD
 
-## Capability KPI Reporting
+- CI workflow: `.github/workflows/ci.yml`
+  - Runs lint, typecheck, test, build on push and pull request.
+- CD workflow: `.github/workflows/vercel-deploy.yml`
+  - Preview deploy on PRs targeting `main`.
+  - Production deploy on push to `main`.
+
+Required GitHub repository secrets for CD:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+## Capability Velocity Artifacts
+
+Operational pack is stored at `docs/capability-velocity/`:
+
+- `raw-capability-pool.csv`
+- `top10-starter-shortlist.md`
+- `capability-register.csv`
+- `execution-status.md`
+- `commercial-readiness.md`
+- `global-readiness-checklist.md`
+- `evidence/`
+- `reports/weekly-kpi-report.md`
+
+Regenerate weekly KPI report:
 
 ```bash
 npm run kpi:report
 ```
 
-This generates `docs/capability-velocity/reports/weekly-kpi-report.md` from telemetry events.
+## Vercel Deployment (Step by Step)
 
-## Capability Velocity Docs
+### Option 1: GitHub + Automated CI/CD (recommended)
 
-Operational planning and execution artifacts are stored under `docs/capability-velocity/`:
+1. Import the repository in Vercel.
+2. In Vercel Project Settings, add runtime environment variables used by the app (`OPENAI_API_KEY`, `COMMERCIAL_API_KEY`, rate-limit vars, and optional Upstash vars).
+3. In GitHub repository settings, add secrets used by CD:
+   - `VERCEL_TOKEN`
+   - `VERCEL_ORG_ID`
+   - `VERCEL_PROJECT_ID`
+4. Protect `main` with required checks (at least CI workflow).
+5. Merge to `main` to trigger production deployment workflow.
 
-- `execution-status.md`: current phase completion status.
-- `raw-capability-pool.csv`: Phase 1 candidate pool.
-- `top10-starter-shortlist.md`: scored shortlist baseline.
-- `evidence/`: hello-world prototype evidence files.
-- `reports/weekly-kpi-report.md`: weekly KPI report artifact.
-- `commercial-readiness.md`: commercialization gate checklist.
-
-## Commercial Deployment Essentials
-
-- Enable `COMMERCIAL_API_KEY` in production.
-- Set rate-limit and payload controls (`API_RATE_LIMIT_*`, `API_MAX_*`).
-- Expose legal pages to end users: `/legal/terms` and `/legal/privacy`.
-- Monitor health endpoint: `/api/health`.
-- Keep CI gates (`lint`, `typecheck`, `test`, `build`) mandatory before release.
-
-## Telemetry Output
-
-Capability run telemetry is persisted to NDJSON at:
-
-- default: `artifacts/telemetry/capability-events.ndjson`
-- override with: `CAPABILITY_TELEMETRY_FILE`
-
-## Design System
-
-The UI uses a **glassmorphism design system** with CSS Custom Properties:
-
-- Animated gradient background orbs
-- Glass blur (`backdrop-filter`) on all interactive surfaces
-- Gradient accent text and buttons
-- Slide-in message animations
-- Glow/shadow effects on focus and hover
-- Responsive breakpoints at 640px
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Push to GitHub
-2. Import repository in [Vercel Dashboard](https://vercel.com/new)
-3. Add `OPENAI_API_KEY` to Environment Variables
-4. Deploy — production-ready with zero config
-
-### Manual Build
+### Option 2: Manual deployment from local machine
 
 ```bash
-npm run build   # Production build
-npm start       # Start production server
+npm install -g vercel
+vercel login
+vercel link
+vercel env pull .env.local
+vercel --prod
 ```
 
-## Security
+## Security Notes
 
-Production builds include the following security headers:
-
-- `X-Frame-Options: DENY`
-- `X-Content-Type-Options: nosniff`
-- `Referrer-Policy: strict-origin-when-cross-origin`
-- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
-
-`/api/chat` also includes:
-
-- Optional API key authentication (`COMMERCIAL_API_KEY`)
-- IP-based rate limiting
-- Payload shape and size validation
+- Keep `COMMERCIAL_API_KEY` enabled in production.
+- Use distributed rate limiting (`UPSTASH_REDIS_*`) for multi-instance/serverless environments.
+- Keep legal pages publicly available.
+- Monitor `/api/health` and telemetry output.
 
 ## License
 
-Proprietary — All Rights Reserved © 2026 MemorAIz. See [LICENSE](./LICENSE).
+Proprietary - All Rights Reserved (c) 2026 MemorAIz. See `LICENSE`.

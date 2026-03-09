@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       return createErrorResponse(authResult.failure);
     }
 
-    const rateLimitResult = enforceRateLimit(req);
+    const rateLimitResult = await enforceRateLimit(req);
     if (!rateLimitResult.ok) {
       await recordCapabilityRun({
         timestamp: new Date().toISOString(),

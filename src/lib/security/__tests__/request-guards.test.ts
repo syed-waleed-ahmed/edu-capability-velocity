@@ -51,7 +51,7 @@ describe("request guards", () => {
     }
   });
 
-  it("limits burst requests by client IP", () => {
+  it("limits burst requests by client IP", async () => {
     process.env.API_RATE_LIMIT_MAX_REQUESTS = "2";
     process.env.API_RATE_LIMIT_WINDOW_MS = "60000";
 
@@ -65,10 +65,10 @@ describe("request guards", () => {
       headers: { "x-forwarded-for": "203.0.113.10" },
     });
 
-    expect(enforceRateLimit(first, 1_000).ok).toBe(true);
-    expect(enforceRateLimit(second, 2_000).ok).toBe(true);
+    expect((await enforceRateLimit(first, 1_000)).ok).toBe(true);
+    expect((await enforceRateLimit(second, 2_000)).ok).toBe(true);
 
-    const thirdResult = enforceRateLimit(third, 3_000);
+    const thirdResult = await enforceRateLimit(third, 3_000);
     expect(thirdResult.ok).toBe(false);
 
     if (!thirdResult.ok) {

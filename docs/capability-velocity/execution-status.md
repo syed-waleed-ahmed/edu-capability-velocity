@@ -26,7 +26,7 @@ Updated: 2026-03-08
 
 ## Phase 3 - Rapid Test + Mandatory Prototypes
 
-- Status: in progress (mandatory baseline complete)
+- Status: complete for mandatory baseline
 - Implemented:
   - Skill/Playbook prototype: `content-converter-agent`
   - MCP/External prototype: `drive-study-package-agent`
@@ -42,6 +42,20 @@ Updated: 2026-03-08
   - `npm run lint`
   - `npm run typecheck`
   - `npm run test`
+  - `npm run build`
+- CD gates enabled in `.github/workflows/vercel-deploy.yml`:
+  - Preview deployment on pull requests to `main` (when Vercel secrets are configured)
+  - Production deployment on pushes to `main` (when Vercel secrets are configured)
 - KPI reporting:
   - `npm run kpi:report`
   - Output: `docs/capability-velocity/reports/weekly-kpi-report.md`
+
+## Phase 4 - Production Hardening
+
+- Status: complete for initial commercial launch
+- Implemented:
+  - API key protection (`COMMERCIAL_API_KEY`)
+  - Payload validation and request-size controls
+  - Rate limiting with distributed Upstash support and in-memory fallback
+  - Legal routes (`/legal`, `/legal/terms`, `/legal/privacy`)
+  - Health endpoint (`/api/health`)
