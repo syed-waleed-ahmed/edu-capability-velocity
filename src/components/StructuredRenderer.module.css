@@ -1,0 +1,30 @@
+.fallback {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  animation: fadeInUp var(--transition-slow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+}
+
+.fallbackTitle {
+  margin: 0 0 var(--space-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-mono);
+  letter-spacing: 0.05em;
+}
+
+.fallbackCode {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}

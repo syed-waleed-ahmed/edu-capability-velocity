@@ -1,0 +1,46 @@
+.container {
+  flex: 1;
+  overflow-y: auto;
+  max-width: none;
+  margin: 0;
+  padding: clamp(14px, 2vw, 24px) clamp(12px, 5vw, 84px);
+  padding-bottom: var(--space-lg);
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  scroll-padding-bottom: var(--space-xl);
+  scrollbar-gutter: stable;
+}
+
+.hasMessages {
+  composes: container;
+  justify-content: flex-start;
+  gap: var(--space-xs);
+}
+
+.empty {
+  composes: container;
+  justify-content: center;
+}
+
+@media (max-width: 980px) {
+  .container,
+  .hasMessages,
+  .empty {
+    padding-top: var(--space-base);
+    padding-left: clamp(10px, 3vw, 32px);
+    padding-right: clamp(10px, 3vw, 32px);
+  }
+}
+
+@media (max-width: 640px) {
+  .container,
+  .hasMessages,
+  .empty {
+    padding: var(--space-base) var(--space-sm);
+    padding-bottom: var(--space-md);
+    border-radius: 0;
+  }
+}

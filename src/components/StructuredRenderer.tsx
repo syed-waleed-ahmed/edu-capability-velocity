@@ -1,13 +1,16 @@
 "use client";
 
 import React from "react";
-import { StudyPackageCard } from "./StudyPackageCard";
-import { FlashcardDeckComponent } from "./FlashcardDeck";
-import { QuizRunner } from "./QuizRunner";
-import { StudyPlanView } from "./StudyPlanView";
+import { StudyPackageCard } from "./micro/StudyPackageCard";
+import { FlashcardDeckComponent } from "./micro/FlashcardDeck";
+import { QuizRunner } from "./micro/QuizRunner";
+import { StudyPlanView } from "./micro/StudyPlanView";
+import { DriveStudyPackageCard } from "./micro/DriveStudyPackageCard";
+import type { StructuredOutput } from "@/schemas/structured-output";
+import styles from "./StructuredRenderer.module.css";
 
 interface StructuredRendererProps {
-  data: Record<string, unknown>;
+  data: StructuredOutput;
 }
 
 /**
@@ -20,40 +23,24 @@ interface StructuredRendererProps {
  * automatic UI rendering by adding a case here.
  */
 export function StructuredRenderer({ data }: StructuredRendererProps) {
-  const type = data?.type as string;
+  const type = data.type;
 
   switch (type) {
+    case "drive-study-package":
+      return <DriveStudyPackageCard data={data} />;
     case "study-package":
-      return <StudyPackageCard data={data as any} />;
+      return <StudyPackageCard data={data} />;
     case "flashcards":
-      return <FlashcardDeckComponent data={data as any} />;
+      return <FlashcardDeckComponent data={data} />;
     case "quiz":
-      return <QuizRunner data={data as any} />;
+      return <QuizRunner data={data} />;
     case "study-plan":
-      return <StudyPlanView data={data as any} />;
+      return <StudyPlanView data={data} />;
     default:
       return (
-        <div
-          style={{
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: "12px",
-            padding: "16px",
-            fontFamily: "'Inter', sans-serif",
-            color: "#94a3b8",
-            fontSize: "13px",
-          }}
-        >
-          <p style={{ margin: "0 0 8px", fontWeight: 600, color: "#e2e8f0" }}>
-            📦 Structured Output
-          </p>
-          <pre
-            style={{
-              margin: 0,
-              whiteSpace: "pre-wrap",
-              fontSize: "12px",
-              lineHeight: "1.5",
-            }}
-          >
+        <div className={styles.fallback}>
+          <p className={styles.fallbackTitle}>📦 Structured Output</p>
+          <pre className={styles.fallbackCode}>
             {JSON.stringify(data, null, 2)}
           </pre>
         </div>

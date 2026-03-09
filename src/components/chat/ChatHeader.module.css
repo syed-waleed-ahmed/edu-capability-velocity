@@ -1,0 +1,217 @@
+.header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 clamp(12px, 2.2vw, 28px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(248, 251, 255, 0.86);
+  height: var(--header-height);
+  gap: var(--space-base);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-base);
+}
+
+.brandIcon {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 22px;
+  line-height: 1;
+  border-radius: 14px;
+  border: 1px solid rgba(31, 95, 191, 0.2);
+  background: linear-gradient(150deg, rgba(31, 95, 191, 0.12), rgba(47, 118, 221, 0.1));
+  box-shadow: var(--shadow-sm);
+}
+
+.brandTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  letter-spacing: var(--letter-spacing-tight);
+  background: var(--gradient-accent);
+  background-size: 160% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 12s ease infinite;
+}
+
+.brandSubtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  font-family: var(--font-family-mono);
+}
+
+.agentTabs {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  max-width: min(58vw, 640px);
+  scrollbar-width: none;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(25, 65, 118, 0.14);
+}
+
+.agentTabs::-webkit-scrollbar {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.legalLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.legalLink {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--font-size-xs);
+  transition: color var(--transition-fast);
+  font-family: var(--font-family-mono);
+}
+
+.legalLink:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.agentTab {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(25, 65, 118, 0.12);
+  color: var(--color-text-secondary);
+  padding: 8px var(--space-lg);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-normal);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.agentTab:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
+.agentTabActive {
+  composes: agentTab;
+  box-shadow: 0 0 0 1px rgba(31, 95, 191, 0.2);
+}
+
+.resetButton {
+  border: 1px solid rgba(25, 65, 118, 0.18);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--color-text-secondary);
+  padding: 9px var(--space-md);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family-mono);
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.resetButton:hover {
+  color: var(--color-accent);
+  border-color: var(--color-border-hover);
+  background: var(--color-bg-hover);
+}
+
+.tabIcon {
+  font-size: var(--font-size-sm);
+  line-height: 1;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 980px) {
+  .header {
+    padding: 0 var(--space-base);
+    height: auto;
+    min-height: 72px;
+  }
+
+  .agentTabs {
+    max-width: min(62vw, 430px);
+  }
+
+  .actions {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+    padding: var(--space-md);
+  }
+
+  .brand {
+    justify-content: center;
+  }
+
+  .brandSubtitle {
+    text-align: center;
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .legalLinks {
+    justify-content: center;
+    gap: var(--space-base);
+  }
+
+  .agentTabs {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 4px;
+  }
+
+  .agentTab,
+  .agentTabActive {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 140px;
+    padding: 10px var(--space-md);
+  }
+
+  .resetButton {
+    width: 100%;
+    padding: 10px var(--space-md);
+  }
+}

@@ -1,0 +1,183 @@
+/* ============================================================
+   StudyPackageCard — Premium CSS Module
+   ============================================================ */
+
+.card {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-2xl);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  width: 100%;
+  max-width: min(100%, 760px);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  animation: fadeInUp var(--transition-slow);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-card);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.header {
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.badge {
+  background: rgba(31, 95, 191, 0.14);
+  padding: 5px var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.packageTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: var(--space-sm) 0 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.summary {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-top: var(--space-xs);
+}
+
+/* Key Concepts */
+.concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.concept {
+  background: rgba(31, 95, 191, 0.1);
+  border: 1px solid rgba(31, 95, 191, 0.2);
+  padding: 5px var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent);
+  transition: all var(--transition-normal);
+  cursor: default;
+}
+
+.concept:hover {
+  background: rgba(31, 95, 191, 0.16);
+  border-color: rgba(31, 95, 191, 0.3);
+}
+
+/* Sections */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.section {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.sectionHeader {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: var(--space-md) var(--space-base);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  transition: background var(--transition-normal);
+  color: var(--color-text-primary);
+  text-align: left;
+  font-family: var(--font-family);
+}
+
+.sectionHeader:hover {
+  background: var(--glass-bg-hover);
+}
+
+.sectionToggle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.sectionBody {
+  padding: var(--space-md) var(--space-base) var(--space-md);
+  border-top: 1px solid var(--glass-border);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Reading Order */
+.readingOrder {
+  margin-top: var(--space-xl);
+  position: relative;
+}
+
+.readingLabel {
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.readingItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.readingNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: rgba(31, 95, 191, 0.12);
+  color: var(--color-accent);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .card {
+    padding: var(--space-lg);
+    max-width: 100%;
+    border-radius: var(--radius-xl);
+  }
+}

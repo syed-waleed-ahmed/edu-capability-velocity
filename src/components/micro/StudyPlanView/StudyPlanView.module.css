@@ -1,0 +1,188 @@
+/* ============================================================
+   StudyPlanView — Premium CSS Module
+   ============================================================ */
+
+.plan {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-2xl);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  width: 100%;
+  max-width: min(100%, 760px);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  animation: fadeInUp var(--transition-slow);
+  position: relative;
+  overflow: hidden;
+}
+
+.plan::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-card);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.header {
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.badge {
+  background: rgba(46, 125, 93, 0.12);
+  padding: 5px var(--space-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  color: #2e7d5d;
+  font-weight: var(--font-weight-medium);
+}
+
+.planTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: var(--space-sm) 0 0;
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.meta {
+  display: flex;
+  gap: var(--space-base);
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Sessions */
+.sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.session {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.sessionHeader {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: var(--space-md) var(--space-base);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-normal);
+  text-align: left;
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+}
+
+.sessionHeader:hover {
+  background: var(--glass-bg-hover);
+}
+
+.sessionTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sessionDuration {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.sessionBody {
+  padding: 0 var(--space-base) var(--space-md);
+  border-top: 1px solid var(--glass-border);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Activities */
+.activities {
+  padding: var(--space-md) 0 0;
+}
+
+.activityLabel {
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.activity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.activityDot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: #10b981;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+/* Resources */
+.resourceLabel {
+  font-size: var(--font-size-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-muted);
+  margin: var(--space-md) 0 var(--space-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.resource {
+  font-size: var(--font-size-sm);
+  color: var(--color-accent-light);
+  padding: var(--space-xs) 0;
+}
+
+/* Milestones */
+.milestone {
+  background: rgba(46, 125, 93, 0.08);
+  border: 1px solid rgba(46, 125, 93, 0.18);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.milestoneHeader {
+  padding: var(--space-md) var(--space-base);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.milestoneIcon {
+  margin-right: var(--space-sm);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .plan {
+    padding: var(--space-lg);
+    max-width: 100%;
+    border-radius: var(--radius-xl);
+  }
+}
