@@ -61,7 +61,7 @@
 .primaryAction {
   justify-content: flex-start;
   background: var(--gradient-accent);
-  color: #fff;
+  color: var(--color-on-accent);
   box-shadow: 0 10px 22px rgba(31, 95, 191, 0.2);
   padding-left: var(--space-base);
 }

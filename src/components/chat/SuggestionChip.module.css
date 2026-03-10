@@ -1,5 +1,5 @@
 .chip {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   padding: 11px var(--space-lg);
   border-radius: 10px;

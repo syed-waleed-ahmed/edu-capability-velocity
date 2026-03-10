@@ -38,6 +38,7 @@
   --color-accent-muted: rgba(31, 95, 191, 0.12);
   --color-accent-border: rgba(31, 95, 191, 0.28);
   --color-accent-glow: rgba(31, 95, 191, 0.2);
+  --color-on-accent: #ffffff;
 
   /* Secondary accents */
   --color-cyan: #2b7a9d;
@@ -172,6 +173,7 @@
   --color-accent-muted: rgba(114, 171, 255, 0.14);
   --color-accent-border: rgba(114, 171, 255, 0.4);
   --color-accent-glow: rgba(114, 171, 255, 0.28);
+  --color-on-accent: #050a10;
 
   --gradient-accent: linear-gradient(120deg, #72abff 0%, #90bcff 100%);
   --gradient-accent-hover: linear-gradient(120deg, #84b6ff 0%, #a2c7ff 100%);

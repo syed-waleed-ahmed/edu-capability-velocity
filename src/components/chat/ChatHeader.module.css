@@ -71,8 +71,8 @@
   scrollbar-width: none;
   padding: 4px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(25, 65, 118, 0.14);
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border);
 }
 
 .agentTabs::-webkit-scrollbar {
@@ -125,8 +125,8 @@
 }
 
 .agentTab {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(25, 65, 118, 0.12);
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--color-text-secondary);
   padding: 8px var(--space-lg);
   border-radius: var(--radius-pill);
@@ -150,6 +150,8 @@
 
 .agentTabActive {
   composes: agentTab;
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border);
   box-shadow: 0 0 0 1px rgba(31, 95, 191, 0.2);
 }
 

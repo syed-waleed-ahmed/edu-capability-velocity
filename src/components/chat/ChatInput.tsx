@@ -38,7 +38,7 @@ export function ChatInput() {
     setMounted(true);
     if (typeof window !== "undefined") {
       const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-      setSpeechRecognitionCtor(ctor);
+      setSpeechRecognitionCtor(() => ctor);
       setSupportsSpeech(Boolean(ctor));
     }
   }, []);
