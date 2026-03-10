@@ -42,8 +42,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {process.env.VERCEL === "1" && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );
