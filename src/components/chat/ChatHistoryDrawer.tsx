@@ -1,23 +1,24 @@
 "use client";
 
 import { KeyboardEvent, useState } from "react";
-import { getAgentById } from "@/config/agents.config";
 import { useChatContext } from "@/context/ChatContext";
 import styles from "./ChatHistoryDrawer.module.css";
 
-function formatTimestamp(iso: string): string {
-  const timestamp = new Date(iso);
-  if (Number.isNaN(timestamp.valueOf())) {
-    return "Unknown time";
-  }
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+);
 
-  return timestamp.toLocaleString([], {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+);
+
+const CheckIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+);
+
+const XIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+);
 
 export function ChatHistoryDrawer() {
   const {
@@ -156,7 +157,6 @@ export function ChatHistoryDrawer() {
           <ul className={styles.sessionList}>
             {historySessions.map((session) => {
               const isActive = session.id === activeSessionId;
-              const agent = getAgentById(session.agentId);
 
               return (
                 <li key={session.id}>
@@ -181,7 +181,7 @@ export function ChatHistoryDrawer() {
                               onClick={() => saveRename(session.id)}
                               aria-label="Save rename"
                             >
-                              ✓
+                              <CheckIcon />
                             </button>
                             <button
                               type="button"
@@ -189,7 +189,7 @@ export function ChatHistoryDrawer() {
                               onClick={cancelRename}
                               aria-label="Cancel rename"
                             >
-                              ↺
+                              <XIcon />
                             </button>
                           </div>
                         </div>
@@ -200,9 +200,6 @@ export function ChatHistoryDrawer() {
                           onClick={() => openHistorySession(session.id)}
                         >
                           <span className={styles.sessionTitle}>{session.title}</span>
-                          <span className={styles.sessionTime}>
-                            {formatTimestamp(session.updatedAt)}
-                          </span>
                         </button>
                       )}
 
@@ -214,7 +211,7 @@ export function ChatHistoryDrawer() {
                           onClick={() => beginRename(session.id, session.title)}
                           disabled={editingSessionId === session.id}
                         >
-                          ✏
+                          <EditIcon />
                         </button>
                         <button
                           type="button"
@@ -222,15 +219,10 @@ export function ChatHistoryDrawer() {
                           aria-label={`Delete ${session.title}`}
                           onClick={() => handleDelete(session.id)}
                         >
-                          ✖
+                          <TrashIcon />
                         </button>
                       </div>
                     </div>
-                    <div className={styles.sessionMeta}>
-                      <span>{agent.name}</span>
-                      <span>{session.messageCount} messages</span>
-                    </div>
-                    <p className={styles.sessionPreview}>{session.preview}</p>
                   </article>
                 </li>
               );

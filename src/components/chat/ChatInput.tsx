@@ -109,7 +109,11 @@ export function ChatInput() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
-        setMicError("Microphone error: " + (event.error || "unknown"));
+        let errMsg = event.error || "unknown";
+        if (errMsg === 'not-allowed') {
+            errMsg = "Access denied. Please allow microphone permissions in your browser settings.";
+        }
+        setMicError(`Microphone Error: ${errMsg}`);
         setIsListening(false);
       };
 
