@@ -2,11 +2,6 @@
 
 AI-powered learning workspace that converts raw educational content into structured micro-experience UIs.
 
-![License](https://img.shields.io/badge/license-Proprietary-red)
-![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Mastra](https://img.shields.io/badge/Mastra-AI_Agents-purple)
-
 ## What This Project Does
 
 This repository implements a capability-first architecture:

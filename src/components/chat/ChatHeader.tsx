@@ -6,12 +6,20 @@ import Link from "next/link";
 import styles from "./ChatHeader.module.css";
 
 export function ChatHeader() {
-  const { selectedAgent, setSelectedAgentId, historySessions } = useChatContext();
+  const { selectedAgent, setSelectedAgentId, setSidebarOpen } = useChatContext();
 
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
         <div className={styles.brand}>
+          <button
+            type="button"
+            className={styles.menuButton}
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
+          >
+            ☰
+          </button>
           <span className={styles.brandIcon}>⚡</span>
           <div>
             <h1 className={styles.brandTitle}>EDU Capability Velocity</h1>

@@ -30,6 +30,8 @@ export function ChatHistoryDrawer() {
     startNewChat,
     theme,
     setTheme,
+    isSidebarOpen,
+    setSidebarOpen,
   } = useChatContext();
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
@@ -108,7 +110,15 @@ export function ChatHistoryDrawer() {
   };
 
   return (
-    <aside className={styles.sidebar} aria-label="Chat history sidebar">
+    <>
+      {isSidebarOpen && (
+        <div
+          className={styles.backdrop}
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ""}`} aria-label="Chat history sidebar">
         <div className={styles.header}>
           <div>
             <p className={styles.eyebrow}>Conversation Memory</p>
@@ -248,6 +258,7 @@ export function ChatHistoryDrawer() {
             </button>
           </div>
         </div>
-    </aside>
+      </aside>
+    </>
   );
 }

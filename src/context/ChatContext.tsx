@@ -247,6 +247,10 @@ interface ChatContextValue {
   deleteHistorySession: (sessionId: string) => void;
   clearHistory: () => void;
 
+  /* Sidebar */
+  isSidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+
   /* Theme */
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
@@ -268,6 +272,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     initialState.activeSessionId
   );
   const [theme, setThemeState] = useState<ThemeMode>(initialState.theme);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const activeSessionIdRef = useRef(initialState.activeSessionId);
   const selectedAgent = getAgentById(agentId);
 
@@ -335,14 +340,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         (session) => session.id === sessionId
       );
 
+      const resolvedAgentId = existingSession ? existingSession.agentId : agentId;
       const nextSession: ChatSession = {
         id: sessionId,
-        agentId,
+        agentId: resolvedAgentId,
         updatedAt: nowIso,
         title: (() => {
-          const fallbackTitle = `${selectedAgent.name} chat`;
+          const fallbackTitle = `${getAgentById(resolvedAgentId).name} chat`;
           if (!existingSession) {
-            return deriveSessionTitle(agentId, storedMessages);
+            return deriveSessionTitle(resolvedAgentId, storedMessages);
           }
 
           const hasCustomTitle =
@@ -353,7 +359,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
             return existingSession.title;
           }
 
-          return deriveSessionTitle(agentId, storedMessages);
+          return deriveSessionTitle(resolvedAgentId, storedMessages);
         })(),
         messages: storedMessages,
       };
@@ -697,6 +703,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         renameHistorySession,
         deleteHistorySession,
         clearHistory,
+        isSidebarOpen,
+        setSidebarOpen: setIsSidebarOpen,
         theme,
         setTheme,
         toggleTheme,
