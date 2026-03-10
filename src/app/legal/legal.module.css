@@ -11,7 +11,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: clamp(20px, 3vw, 36px);
-  background: rgba(10, 10, 16, 0.72);
+  background: var(--glass-bg-strong);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
 }

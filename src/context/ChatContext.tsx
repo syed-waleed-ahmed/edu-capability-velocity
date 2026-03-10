@@ -663,14 +663,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const historySessions = useMemo<ChatHistorySessionSummary[]>(() => {
     return sessions.map((session) => {
-      const latestMessage = session.messages[session.messages.length - 1];
+      const firstUserMessage = session.messages.find((message) => message.role === "user");
       return {
         id: session.id,
         title: session.title,
         agentId: session.agentId,
         updatedAt: session.updatedAt,
         messageCount: session.messages.length,
-        preview: latestMessage?.text ?? "No messages yet",
+        preview: firstUserMessage?.text ?? "No messages yet",
       };
     });
   }, [sessions]);

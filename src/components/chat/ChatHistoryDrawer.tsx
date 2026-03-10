@@ -36,6 +36,7 @@ export function ChatHistoryDrawer() {
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'single', id: string } | { type: 'all' } | null>(null);
 
   const beginRename = (sessionId: string, title: string) => {
     setEditingSessionId(sessionId);
@@ -43,38 +44,36 @@ export function ChatHistoryDrawer() {
   };
 
   const handleDelete = (sessionId: string) => {
-    const shouldDelete = window.confirm(
-      "Delete this chat from history? This cannot be undone."
-    );
-
-    if (!shouldDelete) {
-      return;
-    }
-
-    deleteHistorySession(sessionId);
-
-    if (editingSessionId === sessionId) {
-      setEditingSessionId(null);
-      setDraftTitle("");
-    }
+    setDeleteConfirm({ type: 'single', id: sessionId });
   };
 
   const handleClearHistory = () => {
     if (historySessions.length === 0) {
       return;
     }
+    setDeleteConfirm({ type: 'all' });
+  };
 
-    const shouldClear = window.confirm(
-      "Clear all chat history? This cannot be undone."
-    );
-
-    if (!shouldClear) {
-      return;
+  const executeDelete = () => {
+    if (!deleteConfirm) return;
+    
+    if (deleteConfirm.type === 'single') {
+      deleteHistorySession(deleteConfirm.id);
+      if (editingSessionId === deleteConfirm.id) {
+        setEditingSessionId(null);
+        setDraftTitle("");
+      }
+    } else if (deleteConfirm.type === 'all') {
+      clearHistory();
+      setEditingSessionId(null);
+      setDraftTitle("");
     }
+    
+    setDeleteConfirm(null);
+  };
 
-    clearHistory();
-    setEditingSessionId(null);
-    setDraftTitle("");
+  const cancelDelete = () => {
+    setDeleteConfirm(null);
   };
 
   const saveRename = (sessionId: string) => {
@@ -259,6 +258,23 @@ export function ChatHistoryDrawer() {
           </div>
         </div>
       </aside>
+
+      {deleteConfirm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title" className={styles.modalTitle}>
+              {deleteConfirm.type === 'all' ? "Clear all chat history?" : "Delete this chat?"}
+            </h3>
+            <p className={styles.modalText}>
+              This action cannot be undone. Are you sure you want to proceed?
+            </p>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.modalButtonCancel} onClick={cancelDelete}>Cancel</button>
+              <button type="button" className={styles.modalButtonDanger} onClick={executeDelete}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
