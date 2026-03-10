@@ -12,8 +12,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  padding: var(--space-lg);
-  overflow: hidden;
+  padding: var(--space-lg) var(--space-md);
+  overflow-x: hidden;
+  overflow-y: auto;
   z-index: 2;
 }
 
@@ -136,10 +137,10 @@
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: transparent;
-  padding: 8px var(--space-sm);
+  padding: 6px var(--space-sm);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all var(--transition-fast);
   position: relative;
   min-width: 0;
@@ -153,62 +154,46 @@
   background: rgba(31, 95, 191, 0.09);
 }
 
-.sessionTopRow {
-  display: flex;
-  gap: var(--space-sm);
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-}
-
 .sessionMain {
   border: none;
   background: transparent;
   padding: 0;
   margin: 0;
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+  max-width: calc(100% - 64px);
   display: block;
   text-align: left;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sessionTitle {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
   color: var(--color-text-primary);
-}
-
-.sessionActions {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast);
-}
-
-.sessionItem:hover .sessionActions,
-.sessionItemActive .sessionActions {
-  opacity: 1;
-  pointer-events: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
 }
 
 .iconButton,
 .iconButtonDanger {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--color-text-secondary);
   display: inline-grid;
   place-items: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.iconButton {
+  color: var(--color-text-muted);
+}
+
+.iconButtonDanger {
+  color: #b07070;
 }
 
 .iconButton:hover,

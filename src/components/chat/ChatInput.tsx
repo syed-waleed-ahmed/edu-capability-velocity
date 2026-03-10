@@ -41,16 +41,12 @@ export function ChatInput() {
   const [supportsSpeech, setSupportsSpeech] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (typeof window !== "undefined") {
-        const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-        setSupportsSpeech(Boolean(ctor));
-      }
-      setMounted(true);
-    }, 0);
-    return () => clearTimeout(timer);
+    if (typeof window !== "undefined") {
+      const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+      setSupportsSpeech(Boolean(ctor));
+    }
+    setMounted(true);
   }, []);
-
 
   const handleSubmit = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -87,17 +83,35 @@ export function ChatInput() {
       return;
     }
 
-    // Explicitly prompt the browser's native permissions popup
+    // Step 1: Check the permissions state using the Permissions API
+    // This tells us if the browser has permanently blocked mic access
+    try {
+      if (navigator.permissions) {
+        const permResult = await navigator.permissions.query({ name: "microphone" as PermissionName });
+        if (permResult.state === "denied") {
+          setMicError(
+            "Microphone is blocked by your browser. To fix: click the lock/tune icon 🔒 in the address bar → Site Settings → change Microphone to \"Allow\", then reload the page."
+          );
+          return;
+        }
+      }
+    } catch {
+      // Permissions API not supported or microphone not queryable — continue normally
+    }
+
+    // Step 2: Request mic access — this triggers the native browser popup if state is "prompt"
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // Permission granted, close the stream tracks immediately so it doesn't stay open forever
       stream.getTracks().forEach(track => track.stop());
     } catch {
-      setMicError("Microphone permission denied. Click the lock icon in the address bar to allow.");
+      setMicError(
+        "Microphone access denied. To fix: click the lock/tune icon 🔒 in the address bar → Site Settings → change Microphone to \"Allow\", then reload."
+      );
       setIsListening(false);
       return;
     }
 
+    // Step 3: Start speech recognition
     try {
       const recognition = new Ctor();
       recognition.continuous = false;
@@ -119,11 +133,14 @@ export function ChatInput() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
-        let errMsg = event.error || "unknown";
-        if (errMsg === 'not-allowed') {
-            errMsg = "Access denied. Click the lock icon in the address bar to allow.";
+        const errCode = event.error || "unknown";
+        if (errCode === "not-allowed") {
+          setMicError(
+            "Microphone blocked. Click the lock/tune icon 🔒 in your address bar → Site Settings → Microphone → Allow, then reload."
+          );
+        } else {
+          setMicError(`Microphone error: ${errCode}`);
         }
-        setMicError(`Microphone Error: ${errMsg}`);
         setIsListening(false);
       };
 
@@ -188,6 +205,4 @@ export function ChatInput() {
       )}
     </div>
   );
-
-
 }
