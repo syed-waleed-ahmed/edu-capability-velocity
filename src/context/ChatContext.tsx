@@ -264,28 +264,28 @@ interface ChatContextValue {
 const ChatContext = createContext<ChatContextValue | null>(null);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const [initialState] = useState<InitialChatState>(() => loadInitialState());
-  const [agentId, setAgentId] = useState(initialState.agentId);
+  const defaultAgentId = AGENTS[0].id;
+  const [agentId, setAgentId] = useState(defaultAgentId);
   const [inputText, setInputText] = useState("");
-  const [sessions, setSessions] = useState<ChatSession[]>(initialState.sessions);
-  const [activeSessionId, setActiveSessionId] = useState(
-    initialState.activeSessionId
-  );
-  const [theme, setThemeState] = useState<ThemeMode>(initialState.theme);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const activeSessionIdRef = useRef(initialState.activeSessionId);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState("");
+  const [theme, setThemeState] = useState<ThemeMode>("light");
+  const [isMounted, setIsMounted] = useState(false);
+  const activeSessionIdRef = useRef("");
   const selectedAgent = getAgentById(agentId);
 
   const chat = useMemo(
     () =>
       new Chat({
-        messages: initialState.initialMessages,
+        messages: [],
         transport: new DefaultChatTransport({
           api: "/api/chat",
         }),
       }),
-    [initialState.initialMessages]
+    []
   );
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const {
     messages,
@@ -297,6 +297,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   } = useChat({ chat });
   const messagesRef = useRef<UIMessage[]>(messages);
   const isLoadingRef = useRef(false);
+
+  // Load from local storage immediately on mount to fix hydration mismatch
+  useEffect(() => {
+    const loaded = loadInitialState();
+    setAgentId(loaded.agentId);
+    setSessions(loaded.sessions);
+    setActiveSessionId(loaded.activeSessionId);
+    activeSessionIdRef.current = loaded.activeSessionId;
+    setThemeState(loaded.theme);
+    setMessages(loaded.initialMessages);
+    setIsMounted(true);
+  }, [setMessages]);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -323,6 +335,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
+    if (!isMounted) return;
+
     const sessionId = activeSessionIdRef.current;
     if (!sessionId) {
       return;
@@ -372,7 +386,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       persistSessions(mergedSessions);
       return mergedSessions;
     });
-  }, [messages, agentId, selectedAgent.name]);
+  }, [messages, agentId, selectedAgent.name, isMounted]);
 
   const ensureActiveSession = useCallback(
     (seedText: string): string => {

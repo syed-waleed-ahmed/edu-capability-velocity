@@ -120,8 +120,15 @@
   display: grid;
   gap: var(--space-sm);
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
   flex: 1;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sessionList::-webkit-scrollbar {
+  display: none;
 }
 
 .sessionItem,

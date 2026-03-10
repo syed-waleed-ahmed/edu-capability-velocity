@@ -186,10 +186,6 @@ export function ChatInput() {
           {micError}
         </div>
       )}
-      <p className={styles.hint}>
-        Enter to send, Shift+Enter for a new line
-        {mounted ? (supportsSpeech ? " - mic enabled" : " - mic unavailable") : null}
-      </p>
     </div>
   );
 
