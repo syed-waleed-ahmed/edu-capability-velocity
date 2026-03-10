@@ -75,7 +75,7 @@ This project underwent a rigorous polish phase to transform it from a functional
 ### 2. Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/syed-waleed-ahmed/edu-capability-velocity.git
 cd edu-capability-velocity
 npm install
 ```
