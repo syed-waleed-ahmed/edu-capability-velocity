@@ -45,16 +45,13 @@ export function ChatHeader() {
             })}
           </div>
 
-          <div className={styles.utilityArea}>
-            <span className={styles.historyStat}>History ({historySessions.length})</span>
-            <div className={styles.legalLinks}>
-              <Link className={styles.legalLink} href="/legal/terms">
-                Terms
-              </Link>
-              <Link className={styles.legalLink} href="/legal/privacy">
-                Privacy
-              </Link>
-            </div>
+          <div className={styles.legalLinks}>
+            <Link className={styles.legalLink} href="/legal/terms">
+              Terms
+            </Link>
+            <Link className={styles.legalLink} href="/legal/privacy">
+              Privacy
+            </Link>
           </div>
         </div>
       </div>

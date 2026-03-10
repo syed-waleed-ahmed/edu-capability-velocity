@@ -1,28 +1,14 @@
-"use client";
 
-import {
-  FormEvent,
-  KeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+"use client";
+import { useRef, useState, useEffect, FormEvent, KeyboardEvent } from "react";
 import { useChatContext } from "@/context/ChatContext";
 import styles from "./ChatInput.module.css";
 
-interface SpeechRecognitionAlternativeLike {
-  transcript: string;
-}
-
-interface SpeechRecognitionResultLike {
-  isFinal: boolean;
-  0: SpeechRecognitionAlternativeLike;
-}
-
-interface SpeechRecognitionEventLike {
-  results: ArrayLike<SpeechRecognitionResultLike>;
-  resultIndex: number;
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionCtor;
+    webkitSpeechRecognition?: SpeechRecognitionCtor;
+  }
 }
 
 interface SpeechRecognitionLike {
@@ -31,74 +17,56 @@ interface SpeechRecognitionLike {
   lang: string;
   start: () => void;
   stop: () => void;
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: ((event: unknown) => void) | null;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
   onend: (() => void) | null;
 }
 
-interface SpeechRecognitionCtor {
-  new (): SpeechRecognitionLike;
-}
-
-declare global {
-  interface Window {
-    webkitSpeechRecognition?: SpeechRecognitionCtor;
-    SpeechRecognition?: SpeechRecognitionCtor;
-  }
-}
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
 export function ChatInput() {
-  const { selectedAgent, inputText, setInputText, sendMessage, isLoading } =
-    useChatContext();
-
+  const { selectedAgent, inputText, setInputText, sendMessage, isLoading } = useChatContext();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const speechRecognitionCtor = useMemo<SpeechRecognitionCtor | undefined>(() => {
-    if (typeof window === "undefined") {
-      return undefined;
+  const [supportsSpeech, setSupportsSpeech] = useState(false);
+  const [speechRecognitionCtor, setSpeechRecognitionCtor] = useState<SpeechRecognitionCtor | undefined>(undefined);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined") {
+      const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+      setSpeechRecognitionCtor(ctor);
+      setSupportsSpeech(Boolean(ctor));
     }
-
-    return window.SpeechRecognition ?? window.webkitSpeechRecognition;
   }, []);
-
-  const supportsSpeech = Boolean(speechRecognitionCtor);
 
   useEffect(() => {
     if (!speechRecognitionCtor) {
       recognitionRef.current = null;
       return;
     }
-
     const recognition = new speechRecognitionCtor();
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = "en-US";
 
-    recognition.onresult = (event: SpeechRecognitionEventLike) => {
-      const transcripts: string[] = [];
-
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
-        const result = event.results[index];
-        const transcript = result?.[0]?.transcript?.trim();
-
-        if (result?.isFinal && transcript) {
-          transcripts.push(transcript);
+    recognition.onresult = (event: any) => {
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
         }
       }
-
-      const spokenText = transcripts.join(" ").trim();
-      if (!spokenText) {
-        return;
+      if (finalTranscript) {
+        setInputText((prev) => (prev ? `${prev} ${finalTranscript}` : finalTranscript));
       }
-
-      setInputText((current) => {
-        const prefix = current.trimEnd();
-        return prefix ? `${prefix} ${spokenText}` : spokenText;
-      });
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: any) => {
+      setMicError("Microphone error: " + (event.error || "unknown"));
       setIsListening(false);
     };
 
@@ -107,20 +75,13 @@ export function ChatInput() {
     };
 
     recognitionRef.current = recognition;
-
-    return () => {
-      recognition.stop();
-      recognitionRef.current = null;
-    };
-  }, [setInputText, speechRecognitionCtor]);
+  }, [speechRecognitionCtor, setInputText]);
 
   const handleSubmit = async (event?: FormEvent) => {
     event?.preventDefault();
-
     if (!inputText.trim() || isLoading) {
       return;
     }
-
     const text = inputText;
     setInputText("");
     await sendMessage({ text });
@@ -134,23 +95,27 @@ export function ChatInput() {
   };
 
   const toggleListening = () => {
+    setMicError(null);
     const recognition = recognitionRef.current;
     if (!recognition || !supportsSpeech || isLoading) {
+      if (!supportsSpeech) {
+        setMicError("Voice input is not available in this browser.");
+      }
       return;
     }
-
     if (isListening) {
       recognition.stop();
       setIsListening(false);
       return;
     }
-
     try {
       recognition.start();
       setIsListening(true);
-    } catch {
+    } catch (err: any) {
       setIsListening(false);
+      setMicError("Microphone error: " + (err?.message || "unknown error"));
     }
+
   };
 
   return (
@@ -166,20 +131,22 @@ export function ChatInput() {
           aria-label="Message input"
         />
 
-        <button
-          type="button"
-          className={isListening ? styles.micButtonActive : styles.micButton}
-          onClick={toggleListening}
-          disabled={!supportsSpeech || isLoading}
-          aria-label={isListening ? "Stop voice input" : "Start voice input"}
-          title={
-            supportsSpeech
-              ? "Voice to text"
-              : "Voice input is not available in this browser"
-          }
-        >
-          {isListening ? "Stop" : "Mic"}
-        </button>
+        {mounted && (
+          <button
+            type="button"
+            className={isListening ? styles.micButtonActive : styles.micButton}
+            onClick={toggleListening}
+            disabled={!supportsSpeech || isLoading}
+            aria-label={isListening ? "Stop voice input" : "Start voice input"}
+            title={
+              supportsSpeech
+                ? "Voice to text"
+                : "Voice input is not available in this browser"
+            }
+          >
+            {isListening ? "Stop" : "Mic"}
+          </button>
+        )}
 
         <button
           type="submit"
@@ -189,10 +156,17 @@ export function ChatInput() {
           Send
         </button>
       </form>
+      {micError && (
+        <div className={styles.hint} style={{ color: '#dc6e60', fontWeight: 500 }}>
+          {micError}
+        </div>
+      )}
       <p className={styles.hint}>
         Enter to send, Shift+Enter for a new line
-        {supportsSpeech ? " - mic enabled" : " - mic unavailable"}
+        {mounted ? (supportsSpeech ? " - mic enabled" : " - mic unavailable") : null}
       </p>
     </div>
   );
+
+
 }

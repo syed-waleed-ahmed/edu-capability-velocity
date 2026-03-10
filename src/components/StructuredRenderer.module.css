@@ -10,6 +10,7 @@
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-card);
+  /* Remove any hardcoded white backgrounds for dark mode blending */
 }
 
 .fallbackTitle {
