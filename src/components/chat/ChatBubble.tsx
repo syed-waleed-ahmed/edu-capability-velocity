@@ -37,7 +37,6 @@ function stripCodeFence(text: string): string {
 export function ChatBubble({ message }: ChatBubbleProps) {
   const {
     editUserMessage,
-    deleteMessage,
     regenerateAssistantResponse,
     isLoading,
   } = useChatContext();
@@ -189,15 +188,6 @@ export function ChatBubble({ message }: ChatBubbleProps) {
               ↻
             </button>
           )}
-
-          <button
-            type="button"
-            className={styles.actionButtonDanger}
-            aria-label="Delete message"
-            onClick={() => deleteMessage(message.id)}
-          >
-            ✖
-          </button>
         </div>
       )}
     </div>

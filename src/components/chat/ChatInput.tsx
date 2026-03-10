@@ -17,12 +17,20 @@ interface SpeechRecognitionLike {
   lang: string;
   start: () => void;
   stop: () => void;
-  onresult: ((event: any) => void) | null;
-  onerror: ((event: any) => void) | null;
+  onresult: ((event: unknown) => void) | null;
+  onerror: ((event: unknown) => void) | null;
   onend: (() => void) | null;
 }
 
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
+const MicIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+);
+
+const SendIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+);
 
 export function ChatInput() {
   const { selectedAgent, inputText, setInputText, sendMessage, isLoading } = useChatContext();
@@ -35,47 +43,17 @@ export function ChatInput() {
   const [speechRecognitionCtor, setSpeechRecognitionCtor] = useState<SpeechRecognitionCtor | undefined>(undefined);
 
   useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-      setSpeechRecognitionCtor(() => ctor);
-      setSupportsSpeech(Boolean(ctor));
-    }
+    const timer = setTimeout(() => {
+      if (typeof window !== "undefined") {
+        const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+        setSpeechRecognitionCtor(() => ctor);
+        setSupportsSpeech(Boolean(ctor));
+      }
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (!speechRecognitionCtor) {
-      recognitionRef.current = null;
-      return;
-    }
-    const recognition = new speechRecognitionCtor();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
-
-    recognition.onresult = (event: any) => {
-      let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        }
-      }
-      if (finalTranscript) {
-        setInputText((prev) => (prev ? `${prev} ${finalTranscript}` : finalTranscript));
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      setMicError("Microphone error: " + (event.error || "unknown"));
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-  }, [speechRecognitionCtor, setInputText]);
 
   const handleSubmit = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -96,26 +74,57 @@ export function ChatInput() {
 
   const toggleListening = () => {
     setMicError(null);
-    const recognition = recognitionRef.current;
-    if (!recognition || !supportsSpeech || isLoading) {
-      if (!supportsSpeech) {
-        setMicError("Voice input is not available in this browser.");
-      }
+
+    if (!supportsSpeech || !speechRecognitionCtor) {
+      setMicError("Voice input is not available in this browser.");
       return;
-    }
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-      return;
-    }
-    try {
-      recognition.start();
-      setIsListening(true);
-    } catch (err: any) {
-      setIsListening(false);
-      setMicError("Microphone error: " + (err?.message || "unknown error"));
     }
 
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new speechRecognitionCtor();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onresult = (event: any) => {
+        let finalTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript) {
+          setInputText((prev) => (prev ? `${prev} ${finalTranscript}` : finalTranscript));
+        }
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onerror = (event: any) => {
+        setMicError("Microphone error: " + (event.error || "unknown"));
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+      recognitionRef.current = recognition;
+      setIsListening(true);
+    } catch (err: unknown) {
+      setIsListening(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setMicError("Microphone error: " + ((err as any)?.message || "unknown error"));
+    }
   };
 
   return (
@@ -144,6 +153,7 @@ export function ChatInput() {
                 : "Voice input is not available in this browser"
             }
           >
+            <MicIcon />
             {isListening ? "Stop" : "Mic"}
           </button>
         )}
@@ -153,6 +163,7 @@ export function ChatInput() {
           disabled={isLoading || !inputText.trim()}
           className={styles.sendButton}
         >
+          <SendIcon />
           Send
         </button>
       </form>

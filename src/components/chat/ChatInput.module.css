@@ -80,6 +80,10 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 8px 16px rgba(31, 95, 191, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .micButton,
@@ -97,6 +101,10 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .micButton:hover:not(:disabled),
