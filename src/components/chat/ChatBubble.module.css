@@ -21,55 +21,15 @@
   animation: slideInLeft var(--transition-slow);
 }
 
-.metaRow {
-  width: min(86%, 780px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: 8px;
-}
-
 .label {
+  width: min(86%, 780px);
   font-size: var(--font-size-2xs);
   color: var(--color-text-faint);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-mono);
-}
-
-.messageActions {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.actionButton {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface);
-  color: var(--color-text-secondary);
-  display: inline-grid;
-  place-items: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: var(--font-size-xs);
-  font-family: var(--font-family-mono);
-}
-
-.actionButton:hover,
-.actionButton:focus-visible {
-  color: var(--color-accent);
-  border-color: var(--color-accent-border);
-  background: var(--color-bg-hover);
-}
-
-.actionButton:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+  margin-bottom: 8px;
 }
 
 .bubble {
@@ -96,6 +56,60 @@
   background: var(--glass-bg-strong);
   border: 1px solid var(--glass-border);
   border-radius: 14px 14px 14px 4px;
+}
+
+.actionRow {
+  width: min(86%, 780px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.actionRowUser {
+  composes: actionRow;
+  justify-content: flex-end;
+}
+
+.actionRowAssistant {
+  composes: actionRow;
+  justify-content: flex-start;
+}
+
+.actionButton,
+.actionButtonDanger {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+}
+
+.actionButton:hover,
+.actionButton:focus-visible {
+  color: var(--color-accent);
+  border-color: var(--color-accent-border);
+  background: var(--color-bg-hover);
+}
+
+.actionButtonDanger:hover,
+.actionButtonDanger:focus-visible {
+  color: #dc6e60;
+  border-color: rgba(194, 68, 52, 0.35);
+  background: rgba(194, 68, 52, 0.12);
+}
+
+.actionButton:disabled,
+.actionButtonDanger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .markdown {
@@ -211,11 +225,14 @@
 }
 
 @media (max-width: 820px) {
-  .metaRow,
+  .label,
   .bubble,
   .bubbleUser,
   .bubbleAssistant,
-  .editorPanel {
+  .editorPanel,
+  .actionRow,
+  .actionRowUser,
+  .actionRowAssistant {
     max-width: 100%;
   }
 }

@@ -232,7 +232,8 @@ interface ChatContextValue {
   messages: UIMessage[];
   sendMessage: (opts: { text: string }) => Promise<void>;
   regenerateAssistantResponse: (assistantMessageId: string) => Promise<void>;
-  updateMessageText: (messageId: string, text: string) => void;
+  editUserMessage: (messageId: string, text: string) => Promise<void>;
+  deleteMessage: (messageId: string) => void;
   clearMessages: () => void;
   startNewChat: () => void;
   status: string;
@@ -284,6 +285,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const {
     messages,
     sendMessage: rawSendMessage,
+    regenerate: rawRegenerate,
+    stop: rawStop,
     setMessages,
     status,
   } = useChat({ chat });
@@ -404,34 +407,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     [rawSendMessage, agentId, ensureActiveSession]
   );
 
-  const updateMessageText = useCallback(
-    (messageId: string, text: string) => {
-      const nextText = text.trim();
-      if (!nextText) {
-        return;
-      }
+  const stopActiveStream = useCallback(() => {
+    if (!isLoadingRef.current) {
+      return;
+    }
 
-      setMessages((previousMessages) =>
-        previousMessages.map((message) => {
-          if (message.id !== messageId) {
-            return message;
-          }
-
-          return {
-            ...message,
-            parts: [{ type: "text", text: nextText }],
-          };
-        })
-      );
-    },
-    [setMessages]
-  );
+    rawStop();
+  }, [rawStop]);
 
   const regenerateAssistantResponse = useCallback(
     async (assistantMessageId: string) => {
-      if (isLoadingRef.current) {
-        return;
-      }
+      stopActiveStream();
 
       const messageSnapshot = messagesRef.current;
       const assistantIndex = messageSnapshot.findIndex(
@@ -443,43 +429,136 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      let promptText = "";
+      const branchedMessages = messageSnapshot.slice(0, assistantIndex + 1);
+      setMessages(branchedMessages);
 
-      for (let index = assistantIndex - 1; index >= 0; index -= 1) {
-        const candidate = messageSnapshot[index];
-        if (candidate.role !== "user") {
-          continue;
-        }
+      await new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 0);
+      });
 
-        const candidateText = getTextFromMessage(candidate).trim();
-        if (candidateText) {
-          promptText = candidateText;
+      await rawRegenerate({
+        messageId: assistantMessageId,
+        body: { agent: agentId },
+      });
+    },
+    [agentId, rawRegenerate, setMessages, stopActiveStream]
+  );
+
+  const editUserMessage = useCallback(
+    async (messageId: string, text: string) => {
+      const nextText = text.trim();
+      if (!nextText) {
+        return;
+      }
+
+      stopActiveStream();
+
+      const messageSnapshot = messagesRef.current;
+      const userIndex = messageSnapshot.findIndex(
+        (message) => message.id === messageId && message.role === "user"
+      );
+
+      if (userIndex < 0) {
+        return;
+      }
+
+      let assistantIndex = -1;
+
+      for (let index = userIndex + 1; index < messageSnapshot.length; index += 1) {
+        if (messageSnapshot[index].role === "assistant") {
+          assistantIndex = index;
           break;
         }
       }
 
-      if (!promptText) {
+      if (assistantIndex > -1) {
+        const assistantId = messageSnapshot[assistantIndex].id;
+
+        const branchMessages: UIMessage[] = messageSnapshot
+          .slice(0, assistantIndex + 1)
+          .map((message): UIMessage => {
+            if (message.id !== messageId) {
+              return message;
+            }
+
+            return {
+              ...message,
+              parts: [{ type: "text", text: nextText }],
+            };
+          });
+
+        setMessages(branchMessages);
+
+        await new Promise<void>((resolve) => {
+          window.setTimeout(resolve, 0);
+        });
+
+        await rawRegenerate({
+          messageId: assistantId,
+          body: { agent: agentId },
+        });
+
         return;
       }
 
       await rawSendMessage(
-        { text: promptText },
+        {
+          text: nextText,
+          messageId,
+        },
         {
           body: { agent: agentId },
         }
       );
     },
-    [agentId, rawSendMessage]
+    [agentId, rawRegenerate, rawSendMessage, setMessages, stopActiveStream]
+  );
+
+  const deleteMessage = useCallback(
+    (messageId: string) => {
+      stopActiveStream();
+
+      const messageSnapshot = messagesRef.current;
+      const targetIndex = messageSnapshot.findIndex(
+        (message) => message.id === messageId
+      );
+
+      if (targetIndex < 0) {
+        return;
+      }
+
+      const targetMessage = messageSnapshot[targetIndex];
+      let nextMessages: UIMessage[];
+
+      if (
+        targetMessage.role === "user" &&
+        messageSnapshot[targetIndex + 1]?.role === "assistant"
+      ) {
+        nextMessages = [
+          ...messageSnapshot.slice(0, targetIndex),
+          ...messageSnapshot.slice(targetIndex + 2),
+        ];
+      } else {
+        nextMessages = [
+          ...messageSnapshot.slice(0, targetIndex),
+          ...messageSnapshot.slice(targetIndex + 1),
+        ];
+      }
+
+      setMessages(nextMessages);
+    },
+    [setMessages, stopActiveStream]
   );
 
   const isLoading = status === "streaming" || status === "submitted";
 
   const startNewChat = useCallback(() => {
+    stopActiveStream();
     activeSessionIdRef.current = "";
     setActiveSessionId("");
     setMessages([]);
     setInputText("");
-  }, [setMessages]);
+  }, [setMessages, stopActiveStream]);
 
   const clearMessages = useCallback(() => {
     startNewChat();
@@ -487,6 +566,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const openHistorySession = useCallback(
     (sessionId: string) => {
+      stopActiveStream();
+
       const targetSession = sessions.find((session) => session.id === sessionId);
       if (!targetSession) {
         return;
@@ -507,7 +588,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         return reorderedSessions;
       });
     },
-    [sessions, setMessages]
+    [sessions, setMessages, stopActiveStream]
   );
 
   const renameHistorySession = useCallback(
@@ -533,6 +614,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const deleteHistorySession = useCallback(
     (sessionId: string) => {
+      if (activeSessionIdRef.current === sessionId) {
+        stopActiveStream();
+      }
+
       const remainingSessions = sessions.filter(
         (session) => session.id !== sessionId
       );
@@ -556,17 +641,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setMessages([]);
       }
     },
-    [sessions, setMessages]
+    [sessions, setMessages, stopActiveStream]
   );
 
   const clearHistory = useCallback(() => {
+    stopActiveStream();
+
     activeSessionIdRef.current = "";
     setSessions([]);
     setActiveSessionId("");
     setMessages([]);
     setInputText("");
     persistSessions([]);
-  }, [setMessages]);
+  }, [setMessages, stopActiveStream]);
 
   const historySessions = useMemo<ChatHistorySessionSummary[]>(() => {
     return sessions.map((session) => {
@@ -598,7 +685,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         messages,
         sendMessage,
         regenerateAssistantResponse,
-        updateMessageText,
+        editUserMessage,
+        deleteMessage,
         clearMessages,
         startNewChat,
         status,

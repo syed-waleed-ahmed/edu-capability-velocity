@@ -36,7 +36,8 @@ function stripCodeFence(text: string): string {
 
 export function ChatBubble({ message }: ChatBubbleProps) {
   const {
-    updateMessageText,
+    editUserMessage,
+    deleteMessage,
     regenerateAssistantResponse,
     isLoading,
   } = useChatContext();
@@ -83,36 +84,82 @@ export function ChatBubble({ message }: ChatBubbleProps) {
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     const nextValue = draftText.trim();
     if (!nextValue) {
       return;
     }
 
-    updateMessageText(message.id, nextValue);
     setIsEditing(false);
+    await editUserMessage(message.id, nextValue);
   };
 
   const handleEditKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if ((event.key === "Enter" && (event.metaKey || event.ctrlKey)) || event.key === "Escape") {
+    if (event.key === "Escape") {
       event.preventDefault();
+      setDraftText(text);
+      setIsEditing(false);
+      return;
+    }
 
-      if (event.key === "Escape") {
-        setDraftText(text);
-        setIsEditing(false);
-        return;
-      }
-
-      handleSaveEdit();
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void handleSaveEdit();
     }
   };
 
   return (
     <div className={isUser ? styles.wrapperUser : styles.wrapperAssistant}>
-      <div className={styles.metaRow}>
-        <div className={styles.label}>{isUser ? "You" : "Assistant"}</div>
+      <div className={styles.label}>{isUser ? "You" : "Assistant"}</div>
 
-        <div className={styles.messageActions}>
+      {isUser && isEditing ? (
+        <div className={styles.editorPanel}>
+          <textarea
+            value={draftText}
+            onChange={(event) => setDraftText(event.target.value)}
+            onKeyDown={handleEditKeyDown}
+            className={styles.editorInput}
+            aria-label="Edit message"
+            rows={3}
+          />
+          <div className={styles.editorActions}>
+            <button
+              type="button"
+              className={styles.editorButtonPrimary}
+              onClick={() => void handleSaveEdit()}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              className={styles.editorButtonSecondary}
+              onClick={() => {
+                setDraftText(text);
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : structuredData ? (
+        <StructuredRenderer data={structuredData} />
+      ) : (
+        <div className={isUser ? styles.bubbleUser : styles.bubbleAssistant}>
+          <div className={styles.markdown}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {fallbackText || "..."}
+            </ReactMarkdown>
+          </div>
+        </div>
+      )}
+
+      {!isEditing && (
+        <div
+          className={
+            isUser ? styles.actionRowUser : styles.actionRowAssistant
+          }
+        >
           <button
             type="button"
             className={styles.actionButton}
@@ -142,48 +189,15 @@ export function ChatBubble({ message }: ChatBubbleProps) {
               ↻
             </button>
           )}
-        </div>
-      </div>
 
-      {isUser && isEditing ? (
-        <div className={styles.editorPanel}>
-          <textarea
-            value={draftText}
-            onChange={(event) => setDraftText(event.target.value)}
-            onKeyDown={handleEditKeyDown}
-            className={styles.editorInput}
-            aria-label="Edit message"
-            rows={3}
-          />
-          <div className={styles.editorActions}>
-            <button
-              type="button"
-              className={styles.editorButtonPrimary}
-              onClick={handleSaveEdit}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className={styles.editorButtonSecondary}
-              onClick={() => {
-                setDraftText(text);
-                setIsEditing(false);
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : structuredData ? (
-        <StructuredRenderer data={structuredData} />
-      ) : (
-        <div className={isUser ? styles.bubbleUser : styles.bubbleAssistant}>
-          <div className={styles.markdown}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {fallbackText || "..."}
-            </ReactMarkdown>
-          </div>
+          <button
+            type="button"
+            className={styles.actionButtonDanger}
+            aria-label="Delete message"
+            onClick={() => deleteMessage(message.id)}
+          >
+            ✖
+          </button>
         </div>
       )}
     </div>

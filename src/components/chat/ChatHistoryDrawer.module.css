@@ -1,7 +1,12 @@
 .sidebar {
   height: 100%;
   min-height: 0;
-  background: var(--glass-bg-strong);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-bg-surface) 88%, transparent),
+      color-mix(in srgb, var(--color-bg-secondary) 72%, transparent)
+    );
   border-right: 1px solid var(--glass-border);
   box-shadow: inset -1px 0 0 rgba(31, 95, 191, 0.08);
   display: flex;

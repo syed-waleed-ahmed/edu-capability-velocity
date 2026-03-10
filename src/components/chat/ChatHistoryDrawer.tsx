@@ -41,12 +41,38 @@ export function ChatHistoryDrawer() {
   };
 
   const handleDelete = (sessionId: string) => {
+    const shouldDelete = window.confirm(
+      "Delete this chat from history? This cannot be undone."
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
     deleteHistorySession(sessionId);
 
     if (editingSessionId === sessionId) {
       setEditingSessionId(null);
       setDraftTitle("");
     }
+  };
+
+  const handleClearHistory = () => {
+    if (historySessions.length === 0) {
+      return;
+    }
+
+    const shouldClear = window.confirm(
+      "Clear all chat history? This cannot be undone."
+    );
+
+    if (!shouldClear) {
+      return;
+    }
+
+    clearHistory();
+    setEditingSessionId(null);
+    setDraftTitle("");
   };
 
   const saveRename = (sessionId: string) => {
@@ -107,7 +133,7 @@ export function ChatHistoryDrawer() {
           <button
             type="button"
             className={styles.secondaryAction}
-            onClick={clearHistory}
+            onClick={handleClearHistory}
           >
             Clear all
           </button>

@@ -145,18 +145,18 @@
 }
 
 [data-theme="dark"] {
-  --color-bg-primary: #0c1420;
-  --color-bg-secondary: #111e30;
-  --color-bg-surface: #142337;
-  --color-bg-elevated: #1a2a41;
-  --color-bg-hover: #223551;
-  --color-bg-active: #2a4161;
+  --color-bg-primary: #0b1320;
+  --color-bg-secondary: #0f1a2a;
+  --color-bg-surface: #132336;
+  --color-bg-elevated: #182a40;
+  --color-bg-hover: #21364f;
+  --color-bg-active: #2a4160;
 
-  --glass-bg: rgba(19, 35, 55, 0.82);
-  --glass-bg-strong: rgba(20, 37, 58, 0.94);
-  --glass-bg-hover: rgba(26, 46, 72, 0.98);
-  --glass-border: rgba(129, 163, 212, 0.28);
-  --glass-border-hover: rgba(141, 180, 235, 0.38);
+  --glass-bg: rgba(17, 32, 50, 0.78);
+  --glass-bg-strong: rgba(17, 32, 50, 0.9);
+  --glass-bg-hover: rgba(22, 40, 62, 0.96);
+  --glass-border: rgba(129, 163, 212, 0.22);
+  --glass-border-hover: rgba(141, 180, 235, 0.34);
 
   --color-text-primary: #dbe8fb;
   --color-text-secondary: #b8cde9;
@@ -181,9 +181,9 @@
     rgba(144, 188, 255, 0.05)
   );
   --gradient-bg:
-    radial-gradient(88rem 46rem at 0% -10%, rgba(114, 171, 255, 0.22), transparent 66%),
-    radial-gradient(72rem 40rem at 100% 0%, rgba(74, 130, 190, 0.2), transparent 62%),
-    linear-gradient(180deg, #0c1420 0%, #0f1a29 50%, #0d1624 100%);
+    radial-gradient(88rem 46rem at 0% -10%, rgba(114, 171, 255, 0.16), transparent 66%),
+    radial-gradient(72rem 40rem at 100% 0%, rgba(74, 130, 190, 0.14), transparent 62%),
+    linear-gradient(180deg, #0b1320 0%, #0f1a2a 56%, #0d1624 100%);
 
   --shadow-sm: 0 8px 18px rgba(6, 10, 16, 0.45);
   --shadow-card: 0 18px 36px rgba(5, 10, 15, 0.5);
