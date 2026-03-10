@@ -21,14 +21,55 @@
   animation: slideInLeft var(--transition-slow);
 }
 
+.metaRow {
+  width: min(86%, 780px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 8px;
+}
+
 .label {
   font-size: var(--font-size-2xs);
   color: var(--color-text-faint);
-  margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-mono);
+}
+
+.messageActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actionButton {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-secondary);
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+}
+
+.actionButton:hover,
+.actionButton:focus-visible {
+  color: var(--color-accent);
+  border-color: var(--color-accent-border);
+  background: var(--color-bg-hover);
+}
+
+.actionButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .bubble {
@@ -36,7 +77,6 @@
   max-width: min(86%, 780px);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
-  white-space: pre-wrap;
   word-break: break-word;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -58,12 +98,132 @@
   border-radius: 14px 14px 14px 4px;
 }
 
-/* ─── Responsive ─── */
+.markdown {
+  color: inherit;
+}
+
+.markdown p {
+  margin: 0;
+}
+
+.markdown p + p {
+  margin-top: var(--space-md);
+}
+
+.markdown ul,
+.markdown ol {
+  margin: var(--space-sm) 0 var(--space-sm) var(--space-lg);
+  padding: 0;
+}
+
+.markdown li + li {
+  margin-top: 4px;
+}
+
+.markdown strong {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.markdown code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  background: rgba(31, 95, 191, 0.11);
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+
+.markdown pre {
+  margin: var(--space-sm) 0;
+  padding: var(--space-base);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(14, 33, 57, 0.78);
+  overflow-x: auto;
+}
+
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+  color: #d8e7ff;
+}
+
+.editorPanel {
+  width: min(86%, 780px);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg-strong);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
+  box-shadow: var(--shadow-glow-sm);
+}
+
+.editorInput {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  line-height: var(--line-height-relaxed);
+  resize: vertical;
+  min-height: 86px;
+}
+
+.editorActions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.editorButtonPrimary,
+.editorButtonSecondary {
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  padding: 7px var(--space-md);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.editorButtonPrimary {
+  background: var(--gradient-accent);
+  color: #fff;
+}
+
+.editorButtonPrimary:hover {
+  filter: brightness(1.05);
+}
+
+.editorButtonSecondary {
+  border-color: var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+}
+
+.editorButtonSecondary:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-accent);
+}
+
+@media (max-width: 820px) {
+  .metaRow,
+  .bubble,
+  .bubbleUser,
+  .bubbleAssistant,
+  .editorPanel {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 640px) {
   .bubble,
   .bubbleUser,
   .bubbleAssistant {
-    max-width: 100%;
     padding: var(--space-md) var(--space-base);
     font-size: var(--font-size-sm);
   }

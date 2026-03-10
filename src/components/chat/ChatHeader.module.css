@@ -86,34 +86,23 @@
   min-width: 0;
 }
 
-.historyButton,
-.historyButtonActive {
-  border: 1px solid rgba(31, 95, 191, 0.28);
-  background: rgba(31, 95, 191, 0.12);
+.utilityArea {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.historyStat {
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-muted);
   color: var(--color-accent);
   padding: 9px var(--space-md);
   border-radius: var(--radius-pill);
-  cursor: pointer;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-mono);
-  transition: all var(--transition-normal);
+  letter-spacing: 0.04em;
   white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.historyButton:hover,
-.historyButtonActive {
-  color: var(--color-accent);
-  border-color: var(--color-accent-border);
-  background: rgba(31, 95, 191, 0.2);
-}
-
-.historyIcon {
-  font-size: var(--font-size-sm);
-  line-height: 1;
 }
 
 .legalLinks {
@@ -217,9 +206,13 @@
     gap: var(--space-sm);
   }
 
+  .utilityArea {
+    justify-content: space-between;
+  }
+
   .legalLinks {
-    justify-content: center;
-    gap: var(--space-base);
+    justify-content: flex-end;
+    gap: var(--space-sm);
   }
 
   .agentTabs {
@@ -234,12 +227,6 @@
     flex: 0 0 auto;
     justify-content: center;
     min-width: 140px;
-    padding: 10px var(--space-md);
-  }
-
-  .historyButton,
-  .historyButtonActive {
-    width: 100%;
     padding: 10px var(--space-md);
   }
 }

@@ -13,11 +13,11 @@ export function ChatLayout() {
       <div className={styles.layout}>
         <ChatHeader />
         <section className={styles.workspace}>
+          <ChatHistoryDrawer />
           <div className={styles.chatPane}>
             <ChatMessages />
             <ChatInput />
           </div>
-          <ChatHistoryDrawer />
         </section>
       </div>
     </ChatProvider>

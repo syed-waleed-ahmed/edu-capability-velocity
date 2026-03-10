@@ -6,13 +6,7 @@ import Link from "next/link";
 import styles from "./ChatHeader.module.css";
 
 export function ChatHeader() {
-  const {
-    selectedAgent,
-    setSelectedAgentId,
-    toggleHistory,
-    isHistoryOpen,
-    historySessions,
-  } = useChatContext();
+  const { selectedAgent, setSelectedAgentId, historySessions } = useChatContext();
 
   return (
     <header className={styles.header}>
@@ -51,23 +45,16 @@ export function ChatHeader() {
             })}
           </div>
 
-          <button
-            type="button"
-            className={isHistoryOpen ? styles.historyButtonActive : styles.historyButton}
-            onClick={toggleHistory}
-            aria-label="Open chat history"
-          >
-            <span className={styles.historyIcon}>☰</span>
-            <span>History ({historySessions.length})</span>
-          </button>
-
-          <div className={styles.legalLinks}>
-            <Link className={styles.legalLink} href="/legal/terms">
-              Terms
-            </Link>
-            <Link className={styles.legalLink} href="/legal/privacy">
-              Privacy
-            </Link>
+          <div className={styles.utilityArea}>
+            <span className={styles.historyStat}>History ({historySessions.length})</span>
+            <div className={styles.legalLinks}>
+              <Link className={styles.legalLink} href="/legal/terms">
+                Terms
+              </Link>
+              <Link className={styles.legalLink} href="/legal/privacy">
+                Privacy
+              </Link>
+            </div>
           </div>
         </div>
       </div>

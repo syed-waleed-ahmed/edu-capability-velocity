@@ -231,6 +231,8 @@ interface ChatContextValue {
   /* Chat */
   messages: UIMessage[];
   sendMessage: (opts: { text: string }) => Promise<void>;
+  regenerateAssistantResponse: (assistantMessageId: string) => Promise<void>;
+  updateMessageText: (messageId: string, text: string) => void;
   clearMessages: () => void;
   startNewChat: () => void;
   status: string;
@@ -243,9 +245,6 @@ interface ChatContextValue {
   renameHistorySession: (sessionId: string, title: string) => void;
   deleteHistorySession: (sessionId: string) => void;
   clearHistory: () => void;
-  isHistoryOpen: boolean;
-  toggleHistory: () => void;
-  closeHistory: () => void;
 
   /* Theme */
   theme: ThemeMode;
@@ -254,7 +253,7 @@ interface ChatContextValue {
 
   /* Input */
   inputText: string;
-  setInputText: (text: string) => void;
+  setInputText: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -268,7 +267,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     initialState.activeSessionId
   );
   const [theme, setThemeState] = useState<ThemeMode>(initialState.theme);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const activeSessionIdRef = useRef(initialState.activeSessionId);
   const selectedAgent = getAgentById(agentId);
 
@@ -289,6 +287,16 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setMessages,
     status,
   } = useChat({ chat });
+  const messagesRef = useRef<UIMessage[]>(messages);
+  const isLoadingRef = useRef(false);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  useEffect(() => {
+    isLoadingRef.current = status === "streaming" || status === "submitted";
+  }, [status]);
 
   useEffect(() => {
     activeSessionIdRef.current = activeSessionId;
@@ -394,6 +402,74 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       });
     },
     [rawSendMessage, agentId, ensureActiveSession]
+  );
+
+  const updateMessageText = useCallback(
+    (messageId: string, text: string) => {
+      const nextText = text.trim();
+      if (!nextText) {
+        return;
+      }
+
+      setMessages((previousMessages) =>
+        previousMessages.map((message) => {
+          if (message.id !== messageId) {
+            return message;
+          }
+
+          return {
+            ...message,
+            parts: [{ type: "text", text: nextText }],
+          };
+        })
+      );
+    },
+    [setMessages]
+  );
+
+  const regenerateAssistantResponse = useCallback(
+    async (assistantMessageId: string) => {
+      if (isLoadingRef.current) {
+        return;
+      }
+
+      const messageSnapshot = messagesRef.current;
+      const assistantIndex = messageSnapshot.findIndex(
+        (message) =>
+          message.id === assistantMessageId && message.role === "assistant"
+      );
+
+      if (assistantIndex < 0) {
+        return;
+      }
+
+      let promptText = "";
+
+      for (let index = assistantIndex - 1; index >= 0; index -= 1) {
+        const candidate = messageSnapshot[index];
+        if (candidate.role !== "user") {
+          continue;
+        }
+
+        const candidateText = getTextFromMessage(candidate).trim();
+        if (candidateText) {
+          promptText = candidateText;
+          break;
+        }
+      }
+
+      if (!promptText) {
+        return;
+      }
+
+      await rawSendMessage(
+        { text: promptText },
+        {
+          body: { agent: agentId },
+        }
+      );
+    },
+    [agentId, rawSendMessage]
   );
 
   const isLoading = status === "streaming" || status === "submitted";
@@ -506,14 +582,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     });
   }, [sessions]);
 
-  const toggleHistory = useCallback(() => {
-    setIsHistoryOpen((current) => !current);
-  }, []);
-
-  const closeHistory = useCallback(() => {
-    setIsHistoryOpen(false);
-  }, []);
-
   const setTheme = useCallback((nextTheme: ThemeMode) => {
     setThemeState(nextTheme);
   }, []);
@@ -529,6 +597,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         setSelectedAgentId: setAgentId,
         messages,
         sendMessage,
+        regenerateAssistantResponse,
+        updateMessageText,
         clearMessages,
         startNewChat,
         status,
@@ -539,9 +609,6 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         renameHistorySession,
         deleteHistorySession,
         clearHistory,
-        isHistoryOpen,
-        toggleHistory,
-        closeHistory,
         theme,
         setTheme,
         toggleTheme,

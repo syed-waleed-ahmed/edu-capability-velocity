@@ -27,8 +27,6 @@ export function ChatHistoryDrawer() {
     renameHistorySession,
     deleteHistorySession,
     clearHistory,
-    isHistoryOpen,
-    closeHistory,
     startNewChat,
     theme,
     setTheme,
@@ -37,26 +35,12 @@ export function ChatHistoryDrawer() {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
 
-  const handleCloseDrawer = () => {
-    setEditingSessionId(null);
-    setDraftTitle("");
-    closeHistory();
-  };
-
   const beginRename = (sessionId: string, title: string) => {
     setEditingSessionId(sessionId);
     setDraftTitle(title);
   };
 
   const handleDelete = (sessionId: string) => {
-    const shouldDelete = window.confirm(
-      "Delete this chat from history? This cannot be undone."
-    );
-
-    if (!shouldDelete) {
-      return;
-    }
-
     deleteHistorySession(sessionId);
 
     if (editingSessionId === sessionId) {
@@ -98,30 +82,12 @@ export function ChatHistoryDrawer() {
   };
 
   return (
-    <>
-      <div
-        className={isHistoryOpen ? styles.backdropVisible : styles.backdrop}
-        onClick={handleCloseDrawer}
-        role="presentation"
-      />
-
-      <aside
-        className={isHistoryOpen ? styles.sidebarOpen : styles.sidebar}
-        aria-label="Chat history sidebar"
-      >
+    <aside className={styles.sidebar} aria-label="Chat history sidebar">
         <div className={styles.header}>
           <div>
             <p className={styles.eyebrow}>Conversation Memory</p>
             <h2 className={styles.title}>Chat History</h2>
           </div>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={handleCloseDrawer}
-            aria-label="Close history"
-          >
-            ✕
-          </button>
         </div>
 
         <div className={styles.actions}>
@@ -256,7 +222,6 @@ export function ChatHistoryDrawer() {
             </button>
           </div>
         </div>
-      </aside>
-    </>
+    </aside>
   );
 }
