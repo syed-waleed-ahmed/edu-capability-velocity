@@ -38,15 +38,12 @@ export function ChatInput() {
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
-
   const [supportsSpeech, setSupportsSpeech] = useState(false);
-  const [speechRecognitionCtor, setSpeechRecognitionCtor] = useState<SpeechRecognitionCtor | undefined>(undefined);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (typeof window !== "undefined") {
         const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-        setSpeechRecognitionCtor(() => ctor);
         setSupportsSpeech(Boolean(ctor));
       }
       setMounted(true);
@@ -72,10 +69,12 @@ export function ChatInput() {
     }
   };
 
-  const toggleListening = () => {
+  const toggleListening = async () => {
     setMicError(null);
 
-    if (!supportsSpeech || !speechRecognitionCtor) {
+    const Ctor = typeof window !== "undefined" ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
+
+    if (!supportsSpeech || !Ctor) {
       setMicError("Voice input is not available in this browser.");
       return;
     }
@@ -88,8 +87,19 @@ export function ChatInput() {
       return;
     }
 
+    // Explicitly prompt the browser's native permissions popup
     try {
-      const recognition = new speechRecognitionCtor();
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Permission granted, close the stream tracks immediately so it doesn't stay open forever
+      stream.getTracks().forEach(track => track.stop());
+    } catch {
+      setMicError("Microphone permission denied. Click the lock icon in the address bar to allow.");
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new Ctor();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
@@ -111,7 +121,7 @@ export function ChatInput() {
       recognition.onerror = (event: any) => {
         let errMsg = event.error || "unknown";
         if (errMsg === 'not-allowed') {
-            errMsg = "Access denied. Please allow microphone permissions in your browser settings.";
+            errMsg = "Access denied. Click the lock icon in the address bar to allow.";
         }
         setMicError(`Microphone Error: ${errMsg}`);
         setIsListening(false);
