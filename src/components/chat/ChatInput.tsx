@@ -1,6 +1,6 @@
 
 "use client";
-import { useRef, useState, useEffect, FormEvent, KeyboardEvent } from "react";
+import { useRef, useState, useEffect, useSyncExternalStore, FormEvent, KeyboardEvent } from "react";
 import { useChatContext } from "@/context/ChatContext";
 import styles from "./ChatInput.module.css";
 
@@ -32,21 +32,21 @@ const SendIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
 );
 
+const noop = () => () => {};
+
 export function ChatInput() {
   const { selectedAgent, inputText, setInputText, sendMessage, isLoading } = useChatContext();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [supportsSpeech, setSupportsSpeech] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const ctor = window.SpeechRecognition ?? window.webkitSpeechRecognition;
-      setSupportsSpeech(Boolean(ctor));
-    }
-    setMounted(true);
-  }, []);
+  // useSyncExternalStore avoids setState-in-effect while being SSR-safe
+  const mounted = useSyncExternalStore(noop, () => true, () => false);
+  const supportsSpeech = useSyncExternalStore(
+    noop,
+    () => Boolean(window.SpeechRecognition ?? window.webkitSpeechRecognition),
+    () => false,
+  );
 
   // Auto-request microphone permission on page load so the browser prompts
   // "Allow / Block" immediately instead of waiting for the user to click Mic.

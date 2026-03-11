@@ -306,16 +306,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const messagesRef = useRef<UIMessage[]>(messages);
   const isLoadingRef = useRef(false);
 
-  // Load from local storage immediately on mount to fix hydration mismatch
+  // Load from local storage immediately on mount to fix hydration mismatch.
   useEffect(() => {
     const loaded = loadInitialState();
+    /* eslint-disable react-hooks/set-state-in-effect -- Intentional: deferred localStorage read for SSR hydration safety */
     setAgentId(loaded.agentId);
     setSessions(loaded.sessions);
     setActiveSessionId(loaded.activeSessionId);
     activeSessionIdRef.current = loaded.activeSessionId;
+    sessionsRef.current = loaded.sessions;
     setThemeState(loaded.theme);
     setMessages(loaded.initialMessages);
     setIsMounted(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [setMessages]);
 
   useEffect(() => {
