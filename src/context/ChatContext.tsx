@@ -623,8 +623,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const openHistorySession = useCallback(
     (sessionId: string) => {
-      // Do NOT call stopActiveStream() here — let the agent finish generating
-      // its response so the user can review it later.
+      // If already on this session, do nothing
+      if (activeSessionIdRef.current === sessionId) {
+        return;
+      }
 
       const currentSessions = sessionsRef.current;
       const targetSession = currentSessions.find((session) => session.id === sessionId);
@@ -632,9 +634,27 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // If already on this session, do nothing
-      if (activeSessionIdRef.current === sessionId) {
-        return;
+      // MUST stop any active stream — there's a single useChat instance shared
+      // across all sessions. If we don't stop, the streaming response from the
+      // previous session continues arriving and corrupts the new session's messages.
+      stopActiveStream();
+
+      // Immediately persist the current session's messages before switching,
+      // bypassing the 800ms debounce so nothing is lost.
+      const currentSessionId = activeSessionIdRef.current;
+      if (currentSessionId) {
+        const currentMessages = toStoredMessages(messagesRef.current);
+        if (currentMessages.length > 0) {
+          setSessions((prev) => {
+            const updated = prev.map((s) =>
+              s.id === currentSessionId
+                ? { ...s, messages: currentMessages, updatedAt: new Date().toISOString() }
+                : s
+            );
+            persistSessions(updated);
+            return updated;
+          });
+        }
       }
 
       setAgentId(targetSession.agentId);
@@ -643,7 +663,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setMessages(toUiMessages(targetSession.messages));
       setInputText("");
     },
-    [setMessages]
+    [setMessages, stopActiveStream]
   );
 
   const renameHistorySession = useCallback(

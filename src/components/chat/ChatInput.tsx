@@ -91,10 +91,27 @@ export function ChatInput() {
     }
 
     // Go directly to SpeechRecognition — it handles its own mic permissions.
-    // Skipping getUserMedia pre-check because it can fail with stale/misleading
-    // errors even when the browser mic permission is set to "Allow".
+    // But first, trigger getUserMedia to ensure the browser's permission prompt
+    // has been shown and accepted. On Edge, SpeechRecognition alone won't prompt.
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop()); // Release immediately
+    } catch (err: unknown) {
+      const name = (err as { name?: string })?.name ?? "";
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        setMicError(
+          "Microphone access denied. Click the lock/tune icon 🔒 in your address bar → Site Settings → Microphone → Allow, then reload."
+        );
+      } else if (name === "NotFoundError") {
+        setMicError("No microphone found. Please connect a microphone and try again.");
+      } else {
+        setMicError(`Microphone error: ${name || "unknown"}`);
+      }
+      setIsListening(false);
+      return;
+    }
 
-    // Step 3: Start speech recognition
+    // Start speech recognition
     try {
       const recognition = new Ctor();
       recognition.continuous = false;
@@ -121,6 +138,9 @@ export function ChatInput() {
           setMicError(
             "Microphone blocked. Click the lock/tune icon 🔒 in your address bar → Site Settings → Microphone → Allow, then reload."
           );
+        } else if (errCode === "no-speech") {
+          // User didn't say anything — not an error, just reset
+          setMicError(null);
         } else {
           setMicError(`Microphone error: ${errCode}`);
         }
