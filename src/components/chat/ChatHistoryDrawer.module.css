@@ -118,8 +118,9 @@
   list-style: none;
   margin: 0;
   padding: 2px;
-  display: grid;
-  gap: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;

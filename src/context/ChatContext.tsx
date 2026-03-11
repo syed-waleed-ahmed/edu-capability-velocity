@@ -279,6 +279,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [isMounted, setIsMounted] = useState(false);
   const activeSessionIdRef = useRef("");
+  const sessionsRef = useRef<ChatSession[]>([]);
   const selectedAgent = getAgentById(agentId);
 
   const chat = useMemo(
@@ -320,6 +321,10 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  useEffect(() => {
+    sessionsRef.current = sessions;
+  }, [sessions]);
 
   useEffect(() => {
     isLoadingRef.current = status === "streaming" || status === "submitted";
@@ -601,10 +606,17 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   const openHistorySession = useCallback(
     (sessionId: string) => {
-      stopActiveStream();
+      // Do NOT call stopActiveStream() here — let the agent finish generating
+      // its response so the user can review it later.
 
-      const targetSession = sessions.find((session) => session.id === sessionId);
+      const currentSessions = sessionsRef.current;
+      const targetSession = currentSessions.find((session) => session.id === sessionId);
       if (!targetSession) {
+        return;
+      }
+
+      // If already on this session, do nothing
+      if (activeSessionIdRef.current === sessionId) {
         return;
       }
 
@@ -613,17 +625,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       activeSessionIdRef.current = targetSession.id;
       setMessages(toUiMessages(targetSession.messages));
       setInputText("");
-
-      setSessions((previousSessions) => {
-        const reorderedSessions = clampSessions([
-          targetSession,
-          ...previousSessions.filter((session) => session.id !== targetSession.id),
-        ]);
-        persistSessions(reorderedSessions);
-        return reorderedSessions;
-      });
     },
-    [sessions, setMessages, stopActiveStream]
+    [setMessages]
   );
 
   const renameHistorySession = useCallback(

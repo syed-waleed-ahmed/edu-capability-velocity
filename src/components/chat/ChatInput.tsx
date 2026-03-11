@@ -48,6 +48,20 @@ export function ChatInput() {
     setMounted(true);
   }, []);
 
+  // Auto-request microphone permission on page load so the browser prompts
+  // "Allow / Block" immediately instead of waiting for the user to click Mic.
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices) return;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((t) => t.stop());
+      } catch {
+        // User denied or API unavailable — handled when they click Mic
+      }
+    })();
+  }, []);
+
   // Auto-dismiss mic error after 8 seconds
   useEffect(() => {
     if (!micError) return;
@@ -90,29 +104,16 @@ export function ChatInput() {
       return;
     }
 
-    // Step 1: Check the permissions state using the Permissions API
-    // This tells us if the browser has permanently blocked mic access
-    try {
-      if (navigator.permissions) {
-        const permResult = await navigator.permissions.query({ name: "microphone" as PermissionName });
-        if (permResult.state === "denied") {
-          setMicError(
-            "Microphone is blocked by your browser. To fix: click the lock/tune icon 🔒 in the address bar → Site Settings → change Microphone to \"Allow\", then reload the page."
-          );
-          return;
-        }
-      }
-    } catch {
-      // Permissions API not supported or microphone not queryable — continue normally
-    }
-
-    // Step 2: Request mic access — this triggers the native browser popup if state is "prompt"
+    // Step 1 & 2 combined: Request mic access via getUserMedia.
+    // This handles both the initial prompt and re-checking after permission changes.
+    // We skip the Permissions API check because it can return stale "denied" state
+    // even after the user has re-enabled the microphone in site settings.
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach(track => track.stop());
     } catch {
       setMicError(
-        "Microphone access denied. To fix: click the lock/tune icon 🔒 in the address bar → Site Settings → change Microphone to \"Allow\", then reload."
+        "Microphone access denied. Please enable it in your browser's address bar (click the lock/tune icon 🔒 → Site Settings → Microphone → Allow) and reload."
       );
       setIsListening(false);
       return;
