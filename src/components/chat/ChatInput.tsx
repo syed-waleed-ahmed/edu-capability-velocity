@@ -48,20 +48,6 @@ export function ChatInput() {
     () => false,
   );
 
-  // Auto-request microphone permission on page load so the browser prompts
-  // "Allow / Block" immediately instead of waiting for the user to click Mic.
-  useEffect(() => {
-    if (typeof navigator === "undefined" || !navigator.mediaDevices) return;
-    (async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((t) => t.stop());
-      } catch {
-        // User denied or API unavailable — handled when they click Mic
-      }
-    })();
-  }, []);
-
   // Auto-dismiss mic error after 8 seconds
   useEffect(() => {
     if (!micError) return;
@@ -104,20 +90,9 @@ export function ChatInput() {
       return;
     }
 
-    // Step 1 & 2 combined: Request mic access via getUserMedia.
-    // This handles both the initial prompt and re-checking after permission changes.
-    // We skip the Permissions API check because it can return stale "denied" state
-    // even after the user has re-enabled the microphone in site settings.
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop());
-    } catch {
-      setMicError(
-        "Microphone access denied. Please enable it in your browser's address bar (click the lock/tune icon 🔒 → Site Settings → Microphone → Allow) and reload."
-      );
-      setIsListening(false);
-      return;
-    }
+    // Go directly to SpeechRecognition — it handles its own mic permissions.
+    // Skipping getUserMedia pre-check because it can fail with stale/misleading
+    // errors even when the browser mic permission is set to "Allow".
 
     // Step 3: Start speech recognition
     try {

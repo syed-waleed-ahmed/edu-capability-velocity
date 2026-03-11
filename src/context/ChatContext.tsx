@@ -365,50 +365,64 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const storedMessages = toStoredMessages(messages);
-    if (storedMessages.length === 0) {
-      return;
-    }
+    // Debounce: during streaming, messages change on every chunk.
+    // Only persist once streaming pauses for 800ms — this prevents the
+    // sidebar from constantly re-sorting while the AI is generating.
+    const timerId = window.setTimeout(() => {
+      const storedMessages = toStoredMessages(messages);
+      if (storedMessages.length === 0) {
+        return;
+      }
 
-    const nowIso = new Date().toISOString();
+      const nowIso = new Date().toISOString();
 
-    setSessions((previousSessions) => {
-      const existingSession = previousSessions.find(
-        (session) => session.id === sessionId
-      );
+      setSessions((previousSessions) => {
+        const existingSession = previousSessions.find(
+          (session) => session.id === sessionId
+        );
 
-      const resolvedAgentId = existingSession ? existingSession.agentId : agentId;
-      const nextSession: ChatSession = {
-        id: sessionId,
-        agentId: resolvedAgentId,
-        updatedAt: nowIso,
-        title: (() => {
-          const fallbackTitle = `${getAgentById(resolvedAgentId).name} chat`;
-          if (!existingSession) {
+        const resolvedAgentId = existingSession ? existingSession.agentId : agentId;
+        const nextSession: ChatSession = {
+          id: sessionId,
+          agentId: resolvedAgentId,
+          updatedAt: nowIso,
+          title: (() => {
+            const fallbackTitle = `${getAgentById(resolvedAgentId).name} chat`;
+            if (!existingSession) {
+              return deriveSessionTitle(resolvedAgentId, storedMessages);
+            }
+
+            const hasCustomTitle =
+              existingSession.title !== fallbackTitle &&
+              !existingSession.title.endsWith(" chat");
+
+            if (hasCustomTitle) {
+              return existingSession.title;
+            }
+
             return deriveSessionTitle(resolvedAgentId, storedMessages);
-          }
+          })(),
+          messages: storedMessages,
+        };
 
-          const hasCustomTitle =
-            existingSession.title !== fallbackTitle &&
-            !existingSession.title.endsWith(" chat");
+        // Keep existing session order — just update in-place.
+        // Only prepend if this is a brand-new session.
+        let merged: ChatSession[];
+        if (existingSession) {
+          merged = previousSessions.map((s) =>
+            s.id === sessionId ? nextSession : s
+          );
+        } else {
+          merged = [nextSession, ...previousSessions];
+        }
 
-          if (hasCustomTitle) {
-            return existingSession.title;
-          }
+        const clamped = clampSessions(merged);
+        persistSessions(clamped);
+        return clamped;
+      });
+    }, 800);
 
-          return deriveSessionTitle(resolvedAgentId, storedMessages);
-        })(),
-        messages: storedMessages,
-      };
-
-      const mergedSessions = clampSessions([
-        nextSession,
-        ...previousSessions.filter((session) => session.id !== sessionId),
-      ]);
-
-      persistSessions(mergedSessions);
-      return mergedSessions;
-    });
+    return () => window.clearTimeout(timerId);
   }, [messages, agentId, selectedAgent.name, isMounted]);
 
   const ensureActiveSession = useCallback(
