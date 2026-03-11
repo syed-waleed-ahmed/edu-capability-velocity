@@ -72,7 +72,20 @@ export function ChatInput() {
     }
   };
 
-  const toggleListening = async () => {
+  // Request mic permission on mount as requested, to avoid gesture issues later
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          stream.getTracks().forEach(t => t.stop());
+        })
+        .catch(() => {
+          // Ignore error on load; we'll catch it when the user clicks the mic button
+        });
+    }
+  }, []);
+
+  const toggleListening = () => {
     setMicError(null);
 
     const Ctor = typeof window !== "undefined" ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
@@ -90,28 +103,7 @@ export function ChatInput() {
       return;
     }
 
-    // Go directly to SpeechRecognition — it handles its own mic permissions.
-    // But first, trigger getUserMedia to ensure the browser's permission prompt
-    // has been shown and accepted. On Edge, SpeechRecognition alone won't prompt.
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((t) => t.stop()); // Release immediately
-    } catch (err: unknown) {
-      const name = (err as { name?: string })?.name ?? "";
-      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-        setMicError(
-          "Microphone access denied. Click the lock/tune icon 🔒 in your address bar → Site Settings → Microphone → Allow, then reload."
-        );
-      } else if (name === "NotFoundError") {
-        setMicError("No microphone found. Please connect a microphone and try again.");
-      } else {
-        setMicError(`Microphone error: ${name || "unknown"}`);
-      }
-      setIsListening(false);
-      return;
-    }
-
-    // Start speech recognition
+    // Start speech recognition synchronously within the user gesture context
     try {
       const recognition = new Ctor();
       recognition.continuous = false;
