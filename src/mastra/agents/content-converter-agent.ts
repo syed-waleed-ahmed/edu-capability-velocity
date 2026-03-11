@@ -54,6 +54,11 @@ Create a structured study plan to master the content:
 - Include varied activities (read, practice, review, apply)
 - Set clear milestones for progress tracking
 - Suggest resources and study techniques
+- Use EXACT study plan field names and casing:
+  - top-level: type, title, subject, totalDuration, sessions, milestones
+  - per session: day (number), topic, durationMinutes (number), activities (string[]), resources (string[])
+  - per milestone: name, byDay (number)
+  - Never use snake_case keys (for example, use durationMinutes not duration_minutes, use totalDuration not total_duration)
 
 ## Response Format
 When asked to convert content, produce ONE of the three types based on what the user requests.
