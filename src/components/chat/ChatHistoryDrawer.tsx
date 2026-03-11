@@ -29,6 +29,7 @@ export function ChatHistoryDrawer() {
     deleteHistorySession,
     clearHistory,
     startNewChat,
+    isLoading,
     theme,
     setTheme,
     isSidebarOpen,
@@ -137,10 +138,12 @@ export function ChatHistoryDrawer() {
             type="button"
             className={styles.primaryAction}
             onClick={startNewChat}
+            disabled={isLoading}
             aria-label="Start a new chat"
+            title={isLoading ? "Wait for the current response to finish" : undefined}
           >
             <span className={styles.actionIcon}>✚</span>
-            New chat
+            {isLoading ? "Generating…" : "New chat"}
           </button>
         </div>
 
@@ -200,12 +203,13 @@ export function ChatHistoryDrawer() {
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', minWidth: 0, opacity: isLoading && !isActive ? 0.5 : 1 }}>
                         <button
                           type="button"
                           className={styles.sessionMain}
                           onClick={() => openHistorySession(session.id)}
-                          title={session.title}
+                          disabled={isLoading}
+                          title={isLoading ? "Wait for the current response to finish" : session.title}
                         >
                           {summarize(session.title)}
                         </button>

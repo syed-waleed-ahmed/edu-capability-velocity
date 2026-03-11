@@ -71,6 +71,12 @@
   filter: brightness(1.07);
 }
 
+.primaryAction:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
 .secondaryAction {
   border-color: var(--color-border);
   background: var(--color-bg-elevated);
