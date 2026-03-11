@@ -16,6 +16,7 @@ import type { UIMessage } from "ai";
 
 const CHAT_HISTORY_STORAGE_KEY = "edu-capability-velocity:chat-history:v1";
 const THEME_STORAGE_KEY = "edu-capability-velocity:theme:v1";
+const ACTIVE_SESSION_STORAGE_KEY = "edu-capability-velocity:active-session";
 const MAX_CHAT_SESSIONS = 30;
 const MAX_SESSION_MESSAGES = 120;
 
@@ -204,7 +205,13 @@ function loadInitialState(): InitialChatState {
   const sessions = parseStoredSessions(
     window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
   );
-  const activeSession = sessions[0];
+
+  // Use sessionStorage (per-tab) to restore the active session on reload.
+  // New tabs won't have this key, so they start with a fresh empty chat.
+  const storedActiveId = window.sessionStorage.getItem(ACTIVE_SESSION_STORAGE_KEY) ?? "";
+  const activeSession = storedActiveId
+    ? sessions.find((s) => s.id === storedActiveId)
+    : undefined;
 
   return {
     sessions,
@@ -320,6 +327,14 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     activeSessionIdRef.current = activeSessionId;
+    // Persist the active session to sessionStorage so page reloads restore it
+    if (typeof window !== "undefined") {
+      if (activeSessionId) {
+        window.sessionStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, activeSessionId);
+      } else {
+        window.sessionStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
+      }
+    }
   }, [activeSessionId]);
 
   useEffect(() => {

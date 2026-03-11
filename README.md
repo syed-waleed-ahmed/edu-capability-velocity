@@ -14,8 +14,9 @@ An AI-powered learning workspace designed for the rapid generation of structured
   - `study-package-agent`: Curates comprehensive learning modules.
   - `drive-study-package-agent`: Grounds AI outputs using personal data securely fetched from Google Drive.
 - **Beautiful Glassmorphic UI:** A next-generation premium interface seamlessly blending Light and Dark modes with sleek frosted glass panels, animated mesh gradients, and floating z-index elements.
-- **Persistent AI Chat:** Retains deep session memory and stateful generation in local storage, uniquely mapping conversational histories to specific Agent tabs.
-- **Speech-to-Text Support:** Integrated, robust microphone dictation via the native Web Speech API.
+- **Persistent AI Chat:** Session-aware memory using `sessionStorage` (per-tab) and `localStorage` (cross-tab). Reloading the page restores the active conversation; opening a new tab starts a fresh chat.
+- **Compact Chat History:** A ChatGPT-like sidebar with summarized single-line titles and always-visible edit ✏️ and delete 🗑️ icons for quick session management.
+- **Speech-to-Text Support:** Integrated microphone dictation via the Web Speech API, with Permissions API detection that guides users to unblock the microphone if the browser has permanently denied access.
 
 ---
 
@@ -40,18 +41,24 @@ This project underwent a rigorous polish phase to transform it from a functional
 - **Micro-interactions:** Added smooth transitions, scaling active states, and glowing hover effects on buttons and suggestion chips to create a tactile feeling.
 - **Legal Page Unification:** Stripped legacy opaque backgrounds from the `/legal`, `/terms`, and `/privacy` routes, ensuring they fluidly inherit the glassmorphic theme.
 
-### 2. Functional Polish & Bug Squashing
+### 2. Session & Chat History Management
 
-- **React Hydration Fixes:** Resolved a critical Client/Server mismatch (`Minified React Error #418`) caused by improperly storing the `SpeechRecognition` class constructor directly in React state.
-- **Robust Speech-to-Text:** Refactored the microphone activation logic to instantiate fresh `SpeechRecognition` instances per toggle, bypassing a chromium bug where the mic would silently fail after one use.
-- **Custom Modals:** Eradicated ugly, blocking native `window.confirm()` dialogues. Replaced them with a custom, state-driven React modal inside the `ChatHistoryDrawer` for confirming chat deletions.
-- **Smart Context Previews:** Updated the Chat History context generation. Instead of pulling the *last* message (which was often a messy, stringified JSON payload from the AI), the sidebar now intelligently plucks the *first user prompt* to use as the clean preview text.
+- **Tab-Aware Session Persistence:** Implemented a dual-storage approach using `sessionStorage` (per-tab, survives reload) and `localStorage` (cross-tab session library). Reloading a page restores the active conversation; opening a new browser tab starts a fresh empty chat.
+- **Compact History Sidebar:** Redesigned from a multi-line card layout to a ChatGPT-style single-line format with truncated titles and always-visible inline edit/delete SVG icons — no hover tricks that fail on touch devices.
+- **Custom Modals:** Replaced native `window.confirm()` dialogues with a state-driven React modal for confirming chat deletions.
+- **Smart Context Previews:** The sidebar plucks the first user prompt as the clean preview text instead of raw AI JSON.
 
-### 3. Production Readiness & Vercel Optimization
+### 3. Functional Polish & Bug Squashing
 
-- **Empty State Scaling:** Fixed an annoying layout shift where the page would unnecessarily render a vertical scrollbar when empty. Forced a strict `100vh` flex-column architecture where only the chat history grows.
-- **Vercel Analytics Handling:** Resolved localized `404` console errors by ensuring `SpeedInsights` and `Analytics` components are strictly gated behind `process.env.VERCEL === "1"` environment checks.
-- **Component Pruning:** Cleaned up unused legacy monolithic components (`FlashcardDeck.tsx`, `StudyPlanView.tsx`) in favor of the newly modularized `/micro/` directory variants.
+- **React Hydration Fixes:** Resolved a critical Client/Server mismatch (`Minified React Error #418`) by deferring all `localStorage` reads to a client-side `useEffect`.
+- **Robust Speech-to-Text:** Uses the Permissions API to detect permanently blocked microphone access and shows a clear, dismissible instruction banner guiding users to reset browser permissions via Site Settings.
+- **Empty State Scaling:** Fixed layout shifts by enforcing a strict `100vh` flex-column architecture where only the chat area grows.
+
+### 4. Production Readiness & Vercel Optimization
+
+- **Vercel Analytics Handling:** `SpeedInsights` and `Analytics` components are strictly gated behind `process.env.VERCEL === "1"` environment checks.
+- **Component Pruning:** Cleaned up unused legacy monolithic components in favor of modularized `/micro/` directory variants.
+- **Security Headers:** Configured in `next.config.ts` with API rate limiting and key-based authentication for `/api/chat`.
 
 ---
 

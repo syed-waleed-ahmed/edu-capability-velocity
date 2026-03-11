@@ -48,6 +48,13 @@ export function ChatInput() {
     setMounted(true);
   }, []);
 
+  // Auto-dismiss mic error after 8 seconds
+  useEffect(() => {
+    if (!micError) return;
+    const timer = window.setTimeout(() => setMicError(null), 8000);
+    return () => window.clearTimeout(timer);
+  }, [micError]);
+
   const handleSubmit = async (event?: FormEvent) => {
     event?.preventDefault();
     if (!inputText.trim() || isLoading) {
@@ -199,8 +206,16 @@ export function ChatInput() {
         </button>
       </form>
       {micError && (
-        <div className={styles.hint} style={{ color: '#dc6e60', fontWeight: 500 }}>
-          {micError}
+        <div className={styles.micErrorBanner}>
+          <span>{micError}</span>
+          <button
+            type="button"
+            className={styles.micErrorDismiss}
+            onClick={() => setMicError(null)}
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>
