@@ -16,7 +16,6 @@ An AI-powered learning workspace designed for the rapid generation of structured
 - **Beautiful Glassmorphic UI:** A next-generation premium interface seamlessly blending Light and Dark modes with sleek frosted glass panels, animated mesh gradients, and floating z-index elements.
 - **Persistent AI Chat:** Session-aware memory using `sessionStorage` (per-tab) and `localStorage` (cross-tab). Reloading the page restores the active conversation; opening a new tab starts a fresh chat.
 - **Compact Chat History:** A ChatGPT-like sidebar with summarized single-line titles and always-visible edit ✏️ and delete 🗑️ icons for quick session management.
-- **Speech-to-Text Support:** Integrated microphone dictation via the Web Speech API, with Permissions API detection that guides users to unblock the microphone if the browser has permanently denied access.
 
 ---
 
@@ -50,8 +49,7 @@ This project underwent a rigorous polish phase to transform it from a functional
 
 ### 3. Functional Polish & Bug Squashing
 
-- **React Hydration Fixes:** Resolved a critical Client/Server mismatch (`Minified React Error #418`) by deferring all `localStorage` reads to a client-side `useEffect`.
-- **Robust Speech-to-Text:** Uses the Permissions API to detect permanently blocked microphone access and shows a clear, dismissible instruction banner guiding users to reset browser permissions via Site Settings.
+- **Robust Form Submission:** Smooth handling of keyboard events alongside strict message validation.
 - **Empty State Scaling:** Fixed layout shifts by enforcing a strict `100vh` flex-column architecture where only the chat area grows.
 
 ### 4. Production Readiness & Vercel Optimization
