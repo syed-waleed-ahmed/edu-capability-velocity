@@ -231,6 +231,92 @@ function normalizeFlashcardsPayload(payload: JsonRecord): JsonRecord {
   };
 }
 
+function normalizeStudyPlanSession(session: unknown, index: number): JsonRecord | null {
+  if (!isRecord(session)) return null;
+
+  const day = typeof session.day === "number" ? session.day : index + 1;
+
+  // Topic can come from `topic`, `title`, or first activity
+  const rawActivities = Array.isArray(session.activities)
+    ? session.activities.map((a) => asString(a)).filter((a): a is string => Boolean(a))
+    : [];
+  const topic =
+    asString(session.topic) ??
+    asString(session.title) ??
+    (rawActivities.length > 0 ? rawActivities[0] : `Day ${day}`);
+
+  // Duration: AI may return `durationMinutes` (number) or `duration` (string like "30-60 minutes")
+  let durationMinutes = typeof session.durationMinutes === "number"
+    ? session.durationMinutes
+    : typeof session.duration_minutes === "number"
+      ? session.duration_minutes
+      : 0;
+
+  if (durationMinutes === 0) {
+    const durationStr = asString(session.duration) ?? "";
+    const numbers = durationStr.match(/\d+/g);
+    if (numbers && numbers.length >= 2) {
+      durationMinutes = Math.round(
+        (Number.parseInt(numbers[0], 10) + Number.parseInt(numbers[1], 10)) / 2
+      );
+    } else if (numbers && numbers.length === 1) {
+      durationMinutes = Number.parseInt(numbers[0], 10);
+    } else {
+      durationMinutes = 30;
+    }
+  }
+
+  const resources = Array.isArray(session.resources)
+    ? session.resources.map((r) => asString(r)).filter((r): r is string => Boolean(r))
+    : [];
+
+  return { day, topic, activities: rawActivities, durationMinutes, resources };
+}
+
+function normalizeStudyPlanPayload(payload: JsonRecord): JsonRecord {
+  const rawSessions = Array.isArray(payload.sessions) ? payload.sessions : [];
+  const sessions = rawSessions
+    .map((s, i) => normalizeStudyPlanSession(s, i))
+    .filter((s): s is JsonRecord => Boolean(s));
+
+  // Milestones: may be a top-level array, or embedded as `milestone` string per session
+  let milestones: JsonRecord[];
+  if (Array.isArray(payload.milestones) && payload.milestones.length > 0) {
+    const mapped: (JsonRecord | null)[] = payload.milestones.map((m: unknown) => {
+      if (!isRecord(m)) return null;
+      const name = asString(m.name) ?? asString(m.milestone) ?? "";
+      const byDay = typeof m.byDay === "number" ? m.byDay : typeof m.by_day === "number" ? m.by_day : 0;
+      return name ? ({ name, byDay } as JsonRecord) : null;
+    });
+    milestones = mapped.filter((m): m is JsonRecord => m !== null);
+  } else {
+    // Extract per-session milestones
+    const mapped: (JsonRecord | null)[] = rawSessions.map((s: unknown, i: number) => {
+      if (!isRecord(s)) return null;
+      const name = asString(s.milestone);
+      if (!name) return null;
+      const day = typeof s.day === "number" ? s.day : i + 1;
+      return { name, byDay: day } as JsonRecord;
+    });
+    milestones = mapped.filter((m): m is JsonRecord => m !== null);
+  }
+
+  // totalDuration: may be string or missing
+  const totalDuration =
+    asString(payload.totalDuration) ??
+    asString(payload.total_duration) ??
+    `${sessions.length} days`;
+
+  return {
+    type: "study-plan",
+    title: asString(payload.title) ?? "Study Plan",
+    subject: asString(payload.subject) ?? "General",
+    totalDuration,
+    sessions,
+    milestones,
+  };
+}
+
 function normalizeStructuredCandidate(value: unknown): unknown {
   if (!isRecord(value)) {
     return value;
@@ -246,12 +332,24 @@ function normalizeStructuredCandidate(value: unknown): unknown {
     return normalizeFlashcardsPayload(value);
   }
 
+  if (type === "study-plan" || type === "study_plan" || type === "studyplan") {
+    return normalizeStudyPlanPayload(value);
+  }
+
   if (!type && Array.isArray(value.questions)) {
     return normalizeQuizPayload(value);
   }
 
   if (!type && (Array.isArray(value.cards) || Array.isArray(value.flashcards))) {
     return normalizeFlashcardsPayload(value);
+  }
+
+  // Heuristic: if it has `sessions` with day-based items, it's probably a study plan
+  if (!type && Array.isArray(value.sessions) && value.sessions.length > 0) {
+    const first = value.sessions[0];
+    if (isRecord(first) && ("day" in first || "activities" in first)) {
+      return normalizeStudyPlanPayload(value);
+    }
   }
 
   return value;

@@ -1,5 +1,5 @@
 .wrapper {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-sm);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -29,7 +29,7 @@
   letter-spacing: var(--letter-spacing-wide);
   font-weight: var(--font-weight-medium);
   font-family: var(--font-family-mono);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .bubble {
